@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>インタラクティブ熱力学</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- KaTeX for beautiful math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0KOV3CQDEZwgpcK7hBYVPUUb2EW/wUq5MVtR1INET5GgJqrSHGiuS" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlVwcjN_1qGdv5feMTVbeYgFGpUEiIocfcgwBinsxUsq+YAfSjCGH/LlgpT" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+
+    <style>
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: #f8f9fa; color: #212529; }
+        .tab-button { transition: all 0.3s ease; }
+        .tab-button.active { border-color: #0d6efd; background-color: #e7f1ff; color: #0d6efd; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .formula { background-color: #e9ecef; border-left: 4px solid #0d6efd; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 320px; max-height: 400px; }
+        .state-box { border: 2px solid #6c757d; background-color: white; }
+        .process-step { border-left: 4px solid #ccc; }
+        .process-step:hover { border-left-color: #0d6efd; }
+        .diag-piston-cylinder { background-color: #e9ecef; border: 2px solid #adb5bd; height: 60px; }
+        .diag-gas-area { height: 100%; }
+        .diag-piston-head { background-color: #868e96; border-left: 3px solid #495057; }
+        .diag-pressure-weight { background-color: #495057; height: 6px; border-radius: 2px; margin-bottom: 2px; }
+        #molecule-canvas, #brownian-canvas, #brownian-dist-canvas, #heat-pump-canvas { border: 2px solid #343a40; background-color: #f1f3f5; }
+        .katex { font-size: 1.1em !important; }
+        @media (min-width: 768px) { .chart-container { height: 400px; } }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800">インタラクティブ熱力学</h1>
+            <p class="text-gray-600 mt-2">見て、触って、熱力学の法則を体感しよう。</p>
+        </header>
+
+        <nav class="flex flex-wrap justify-center border-b-2 border-gray-200 mb-8 space-x-2 md:space-x-4" id="nav-tabs">
+            <button data-tab="basics" class="tab-button font-semibold py-3 px-4 md:px-6 border-b-4 border-transparent hover:border-blue-500 hover:bg-blue-50 focus:outline-none">基礎概念</button>
+            <button data-tab="micro" class="tab-button font-semibold py-3 px-4 md:px-6 border-b-4 border-transparent hover:border-blue-500 hover:bg-blue-50 focus:outline-none">ミクロの世界</button>
+            <button data-tab="simulator" class="tab-button font-semibold py-3 px-4 md:px-6 border-b-4 border-transparent hover:border-blue-500 hover:bg-blue-50 focus:outline-none">サイクルビルダー</button>
+            <button data-tab="transition-diagram" class="tab-button font-semibold py-3 px-4 md:px-6 border-b-4 border-transparent hover:border-blue-500 hover:bg-blue-50 focus:outline-none">状態遷移</button>
+            <button data-tab="engine" class="tab-button font-semibold py-3 px-4 md:px-6 border-b-4 border-transparent hover:border-blue-500 hover:bg-blue-50 focus:outline-none">熱機関</button>
+        </nav>
+
+        <main>
+            <section id="basics" class="content-section space-y-8">
+                <!-- 基礎概念のコンテンツは変更なし -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-700">熱力学の基本要素：ストックとフロー</h2>
+                    <p class="mb-6">熱力学は、フロー(Flow)である熱、仕事、そして、ストック(Stock)である物質の状態（温度、圧力、体積）の間の関係を扱う学問です。物理量をその性質から**ストック**と**フロー**の2種類に大別すると便利で、この区別を理解することが、熱力学を学ぶ上での最初の重要なステップです。</p>
+                    
+                    <div class="overflow-x-auto mb-6">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="p-3 font-semibold border">種類</th>
+                                    <th class="p-3 font-semibold border">説明</th>
+                                    <th class="p-3 font-semibold border">熱力学での例</th>
+                                    <th class="p-3 font-semibold border">日常での例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="p-3 border font-bold">ストック (Stock)</td>
+                                    <td class="p-3 border">ある瞬間に「蓄えられている量」。状態が決まれば値が決まる**状態量**。</td>
+                                    <td class="p-3 border">**内部エネルギー (U)**, 圧力(P), 体積(V), 温度(T)</td>
+                                    <td class="p-3 border">貯金の残高, ダムの貯水量</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 border font-bold">フロー (Flow)</td>
+                                    <td class="p-3 border">ある状態から別の状態へ変化する「過程」で移動する量。ストックを増減させる原因。</td>
+                                    <td class="p-3 border">**熱 (Q)**, **仕事 (W)**</td>
+                                    <td class="p-3 border">預け入れ/引き出し, ダムへの流入/流出</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="my-8 p-6 bg-gray-50 rounded-lg">
+                        <h3 class="text-xl font-bold text-center mb-4">内部エネルギー (ストック) と熱・仕事 (フロー) の関係図</h3>
+                        <div class="flex items-center justify-center space-x-4">
+                            <div class="text-center p-4">
+                                <p class="font-semibold">フロー（流れ込み）</p>
+                                <p class="text-sm text-gray-600">熱 (Q > 0), 仕事 (W > 0)</p>
+                            </div>
+                            <div class="text-5xl text-gray-400">→</div>
+                            <div class="relative p-4 border-4 border-blue-500 rounded-lg bg-blue-100 w-48 h-48 flex items-center justify-center text-center">
+                                <div class="font-bold">
+                                    <p class="text-2xl">内部エネルギー U</p>
+                                    <p>(ストック)</p>
+                                </div>
+                            </div>
+                            <div class="text-5xl text-gray-400">→</div>
+                            <div class="text-center p-4">
+                                <p class="font-semibold">フロー（流れ出し）</p>
+                                <p class="text-sm text-gray-600">熱 (Q < 0), 仕事 (W < 0)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">🌡️ 内部エネルギー (ストック)</h3>
+                            <p class="mb-2"><b>内部エネルギー (U)</b> は、気体が蓄えているエネルギーの総量です。これは温度(T)によって決まる状態量（ストック）です。</p>
+                            <div class="formula p-4 rounded-md mt-4 text-center">
+                                <p class="font-bold">単原子分子理想気体の場合</p>
+                                <p>$U = \frac{3}{2}nRT$</p>
+                                <p class="text-sm text-gray-600 mt-1">n: 物質量 [mol], R: 気体定数</p>
+                            </div>
+                             <div class="formula p-4 rounded-md mt-4 border-l-green-500 text-center">
+                                <h4 class="font-bold">応用：二原子分子の場合</h4>
+                                <p class="text-sm mb-2">二原子分子（O₂, N₂など）は並進運動に加え、**回転運動**にもエネルギーを持つため、より多くのエネルギーを蓄えられます。</p>
+                                <p>$U = \frac{5}{2}nRT$</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">🔥 熱と仕事 (フロー)</h3>
+                            <p class="mb-2"><b>熱 (Q)</b> と<b>仕事 (W)</b>は、状態を変化させる過程で出入りするエネルギーの移動量（フロー）です。これらは「気体が熱を持っている」のではなく、あくまで状態変化の際に移動する量です。</p>
+                            <p class="mt-4 mb-2"><b>熱力学第一法則</b>は、ストックとフローの関係、つまり内部エネルギーの変化が熱と仕事の出入りによって決まることを示します。これはエネルギー保存則を熱力学的な系に適用したもので、「ある系の内部エネルギーの変化は、系に加えられた熱と系に対して行われた仕事の和に等しい」と表現されます。</p>
+                             <div class="formula p-4 rounded-md mt-4">
+                                <p>$\Delta U = Q + W$</p>
+                                <p class="text-sm mt-1">内部エネルギー(ストック)の変化量 = 流入した熱(フロー) + された仕事(フロー)</p>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="micro" class="content-section space-y-8">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-700">ミクロの世界：気体分子運動論と統計法則</h2>
+                    
+                    <div class="mb-12">
+                        <h3 class="text-xl font-bold mb-2">熱と分子運動</h3>
+                        <p class="mb-6">
+                            <b>温度</b>とは、分子の平均運動エネルギー、つまり「今どれだけエネルギーを蓄えているか」を示す**ストック (Stock)** の指標です。
+                            一方、<b>熱</b>とは、そのストックを増減させるエネルギーの「流れ」、すなわち**フロー (Flow)** です。
+                            「加熱」「冷却」ボタンで熱のフローを操作し、内部エネルギーのストックが変化することで、温度や圧力がどう変わるか観察してみましょう。
+                        </p>
+                        <div class="grid md:grid-cols-3 gap-6 items-center">
+                            <div class="md:col-span-2 h-[400px]">
+                                <canvas id="molecule-canvas" class="w-full h-full"></canvas>
+                            </div>
+                            <div class="space-y-4 bg-gray-50 p-4 rounded-lg">
+                                <div>
+                                    <h3 class="font-bold text-lg">熱のフロー操作</h3>
+                                    <div class="flex gap-2 mt-2">
+                                        <button id="heat-up-btn-gas" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">🔥 加熱 (流入)</button>
+                                        <button id="cool-down-btn-gas" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">❄️ 冷却 (流出)</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg">内部エネルギー (ストック)</h3>
+                                    <div class="w-full bg-gray-200 rounded-full h-8 border-2 border-gray-400 my-2">
+                                        <div id="energy-bar" class="bg-gradient-to-r from-blue-500 to-red-500 h-full rounded-full transition-all duration-500" style="width: 50%;"></div>
+                                    </div>
+                                    <p class="text-xl font-mono bg-white p-2 rounded mt-1">絶対温度 T [K]: <span id="temp-display">300</span></p>
+                                    <p class="text-sm font-mono bg-white p-2 rounded mt-1">平均運動エネルギー: <span id="ke-display">6.21</span></p>
+                                </div>
+                                 <div>
+                                    <h3 class="font-bold text-lg">結果として現れる圧力</h3>
+                                    <p class="text-sm">分子が壁に衝突することで圧力が生まれます。</p>
+                                    <p class="text-2xl font-mono bg-white p-2 rounded mt-1">衝突/秒: <span id="pressure-display">0</span></p>
+                                </div>
+                            </div>
+                        </div>
+                         <div class="grid md:grid-cols-2 gap-6 mt-6">
+                            <div class="formula p-4 rounded-md text-center">
+                                <h3 class="font-bold text-lg mb-2">① 圧力の導出</h3>
+                                <p class="text-sm mb-2 text-left">圧力Pは、N個の分子が体積Vの容器内で壁に衝突することによって生じます。分子の質量をm、速度の二乗平均を $\overline{v^2}$ とすると、圧力は以下のように表せます。</p>
+                                <p>$P = \frac{1}{3}\frac{N}{V}m\overline{v^2}$</p>
+                                <p class="text-sm mt-2 text-left">分子が速く（温度が高く）なると、衝突の勢いと頻度が増し、圧力が上昇します。</p>
+                            </div>
+                            <div class="formula p-4 rounded-md text-center">
+                                <h3 class="font-bold text-lg mb-2">② 絶対温度とエネルギー</h3>
+                                <p class="text-sm mb-2 text-left">絶対温度Tは、分子1個あたりの平均**並進**運動エネルギーに比例します。この関係は、単原子分子の場合、以下のように表せます。</p>
+                                <p>$\frac{1}{2}m\overline{v^2} = \frac{3}{2}kT$</p>
+                                <p class="text-sm mt-2 text-left"><b>k</b>はボルツマン定数(約$1.38 \times 10^{-23}$ J/K)です。熱を加えて運動が激しくなると平均運動エネルギーが増え、温度が上昇します。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-8 border-gray-300">
+
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">ブラウン運動と統計法則</h3>
+                        <p class="mb-6">
+                            マクロな熱現象は、無数の分子のミクロな振る舞いの統計的な結果として現れます。ここでは、その代表例である**ブラウン運動**と**ボルツマン分布**をシミュレーションで観察します。
+                        </p>
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h4 class="font-bold text-lg mb-2">ブラウン運動シミュレーション</h4>
+                                <div class="relative h-[300px]">
+                                    <canvas id="brownian-canvas" class="w-full h-full"></canvas>
+                                </div>
+                                 <div class="flex items-center justify-between mt-2">
+                                    <div class="flex items-center space-x-2">
+                                        <button id="restart-brownian-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-3 rounded text-sm">リスタート</button>
+                                        <label class="text-sm"><input type="checkbox" id="trace-checkbox" class="mr-1">軌跡を表示</label>
+                                        <label class="text-sm"><input type="checkbox" id="show-water-checkbox" class="mr-1">媒質粒子を表示</label>
+                                    </div>
+                                    <div class="text-sm">
+                                        <span class="font-bold">温度:</span> <span id="brownian-temp-display">300</span> K
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-2">分子の速度分布（ボルツマン分布）</h4>
+                                <div class="relative h-[300px]">
+                                    <canvas id="boltzmann-chart"></canvas>
+                                </div>
+                                 <div class="flex items-center justify-center gap-2 mt-2">
+                                    <button id="heat-up-btn-boltzmann" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded text-sm">🔥 加熱</button>
+                                    <button id="cool-down-btn-boltzmann" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded text-sm">❄️ 冷却</button>
+                                    <button id="hold-dist-btn" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-3 rounded text-sm">現在の分布を保持</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 formula p-4 rounded-md">
+                            <h4 class="font-bold text-lg mb-2">ブラウン運動とボルツマン分布の解説</h4>
+                            <p class="text-sm"><b>ブラウン運動</b>は、液体や気体中に浮遊する微粒子（シミュレーションの黄色い粒子）が、周囲の無数の分子（媒質粒子）の不規則な衝突によって、ランダムに動く現象です。アインシュタインは、この運動を解析することで原子や分子の存在を証明しました。</p>
+                            <p class="text-sm mt-2">一方、ある温度Tにおいて、分子の速さがどのような分布を持つかを示したのが**ボルツマン分布**です。温度が低いと分子はゆっくり動き（グラフの山は左に寄る）、温度が高いと速く動く分子の割合が増えます（グラフの山は右に移動し、裾野が広がる）。ブラウン運動の激しさは、この分子の速度分布によって決まります。</p>
+                        </div>
+                    </div>
+
+                    <!-- ブラウン運動と正規分布のシミュレーション -->
+                    <hr class="my-8 border-gray-300">
+                    <div class="mt-8">
+                        <h3 class="text-xl font-bold mb-2">ブラウン運動から正規分布へ</h3>
+                        <div class="mb-6 bg-blue-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-lg mb-2">シミュレーションの解説</h4>
+                            <ul class="list-disc list-inside text-sm space-y-1">
+                                <li><b>目的:</b> 多数の独立したブラウン運動が、全体としてどのような分布を形成するかを可視化します。</li>
+                                <li><b>試行回数:</b> シミュレーションで動かす独立した粒子の総数を指します。ここでは500個の粒子を同時に動かします。各粒子は同じ法則に従いますが、媒質分子とのランダムな衝突により、それぞれ異なる軌跡を描きます。</li>
+                                <li><b>移動距離:</b> 各粒子が、中央のスタート地点からどれだけ離れた位置で動きを終えたかを示します。このシミュレーションでは、一定時間後の最終的な位置（到達点）を記録しています。</li>
+                                <li><b>色分け:</b> シミュレーション完了後、粒子の最終到達点は色分けされます。右のグラフで山が高くなっている場所（多くの粒子が到達した場所）は<span class="text-red-500 font-bold">赤色</span>に、逆に山が低い場所（到達した粒子が少ない場所）は<span class="text-blue-500 font-bold">青色</span>に近くなります。これにより、粒子の到達確率の分布を直感的に理解できます。</li>
+                            </ul>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-8 items-start">
+                            <div>
+                                <h4 class="font-bold text-lg mb-2 text-center">粒子到達点シミュレーション</h4>
+                                <canvas id="brownian-dist-canvas" class="w-full h-[300px]"></canvas>
+                                <div class="flex items-center justify-center gap-4 mt-2">
+                                    <button id="start-dist-sim-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">シミュレーション開始</button>
+                                    <button id="reset-dist-sim-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">リセット</button>
+                                    <label class="text-sm"><input type="checkbox" id="show-dist-medium-checkbox" class="mr-1">媒質粒子を表示</label>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-2 text-center">水平方向の到達点分布</h4>
+                                <div class="relative h-[300px]">
+                                    <canvas id="normal-dist-chart"></canvas>
+                                </div>
+                                <p class="text-center text-sm mt-2">試行回数: <span id="trial-count-display" class="font-bold">0</span></p>
+                            </div>
+                        </div>
+                        <div class="mt-6 formula p-4 rounded-md border-l-green-500">
+                            <h4 class="font-bold text-lg mb-2">変位と正規分布</h4>
+                            <p class="text-sm mb-2">時刻 $t$ における粒子の位置 $x$ の確率分布 $P(x, t)$ は、以下の正規分布の形で与えられます。これは拡散の挙動を記述する**拡散方程式**の解です。</p>
+                            <p class="text-center my-2">
+                                $P(x, t) = \frac{1}{\sqrt{4\pi Dt}} e^{-\frac{(x-\mu)^2}{4Dt}}$
+                            </p>
+                            <p class="text-sm mt-2">ここで、$D$ は**拡散係数**でブラウン運動の激しさを表し、$\mu$ は平均変位（通常は0）です。この式は、時間が経つにつれて分布の幅が広がる（分散 $\sigma^2 = 2Dt$ が増大する）ことを示しています。つまり、粒子は時間とともに遠くまで拡散していくのです。</p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <section id="simulator" class="content-section space-y-8">
+                 <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-700">サイクルビルダー＆シミュレーター</h2>
+                    <p class="mb-6">熱力学サイクルを自由に設計し、シミュレーションを実行します。まず初期値を設定し、次に「ステップを追加」してプロセスのシーケンスを構築してください。各ステップで変化させる物理量とその値を指定できます。</p>
+                    
+                    <div class="grid md:grid-cols-1 gap-8">
+                        <div>
+                            <div class="grid md:grid-cols-2 gap-8">
+                                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                                    <h3 class="text-lg font-semibold mb-3">1. 初期値の設定</h3>
+                                    <p class="text-xs text-gray-500 mb-2">（単原子分子1mol、R=8.31 J/(mol・K)、1atm=101325 Paとして、状態方程式 PV=RT に基づき自動調整されます）</p>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <div>
+                                            <label for="initial-p" class="block text-sm font-medium text-gray-700">圧力 P [atm]</label>
+                                            <input type="number" id="initial-p" value="1" min="0.1" step="0.1" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                                        </div>
+                                        <div>
+                                            <label for="initial-v" class="block text-sm font-medium text-gray-700">体積 V [m³]</label>
+                                            <input type="number" id="initial-v" value="0.0246" min="0.001" step="0.001" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                                        </div>
+                                        <div>
+                                            <label for="initial-t" class="block text-sm font-medium text-gray-700">温度 T [K]</label>
+                                            <input type="number" id="initial-t" value="300" min="1" step="1" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h3 class="text-lg font-semibold mb-3">2. プロセスシーケンスの設定</h3>
+                                    <p class="text-xs text-gray-500 mb-2"><b>絶対値:</b> 入力した値そのものを目標値とします。<br><b>倍数:</b> 前の状態の値に入力した数値を掛けた値を目標値とします。</p>
+                                    <div id="process-list" class="space-y-4"></div>
+                                    <button id="add-step-btn" class="mt-4 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">ステップを追加</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                           <div class="chart-container">
+                                <h4 class="text-center font-semibold text-gray-600">P-V図</h4>
+                                <canvas id="pv-chart"></canvas>
+                            </div>
+                            <div class="chart-container">
+                                <h4 class="text-center font-semibold text-gray-600">V-T図</h4>
+                                <canvas id="vt-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 bg-gray-50 p-4 rounded-lg">
+                         <h3 class="text-lg font-semibold mb-3">サイクル再現のための設定例</h3>
+                         <p class="text-sm mb-4">以下の表を参考に、カルノーサイクルや逆カルノーサイクルを再現してみましょう。</p>
+                         <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-center mb-2">カルノーサイクル (熱機関)</h4>
+                                <table class="w-full text-sm text-left border-collapse">
+                                    <thead><tr class="bg-gray-200"><th class="p-2 border">ステップ</th><th class="p-2 border">プロセス</th><th class="p-2 border">設定 (状態量)</th><th class="p-2 border">値 (絶対値)</th></tr></thead>
+                                    <tbody>
+                                        <tr><td class="p-2 border" colspan="4"><b>初期値:</b> P=2.46 atm, V=0.02 m³, T=600 K</td></tr>
+                                        <tr><td class="p-2 border">1</td><td class="p-2 border">等温変化</td><td class="p-2 border">体積 V</td><td class="p-2 border">0.04</td></tr>
+                                        <tr><td class="p-2 border">2</td><td class="p-2 border">断熱変化</td><td class="p-2 border">温度 T</td><td class="p-2 border">300</td></tr>
+                                        <tr><td class="p-2 border">3</td><td class="p-2 border">等温変化</td><td class="p-2 border">体積 V</td><td class="p-2 border">0.0566</td></tr>
+                                        <tr><td class="p-2 border">4</td><td class="p-2 border">断熱変化</td><td class="p-2 border">体積 V</td><td class="p-2 border">0.02</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-center mb-2">逆カルノーサイクル (ヒートポンプ)</h4>
+                                <table class="w-full text-sm text-left border-collapse">
+                                    <thead><tr class="bg-gray-200"><th class="p-2 border">ステップ</th><th class="p-2 border">プロセス</th><th class="p-2 border">設定 (状態量)</th><th class="p-2 border">値 (絶対値)</th></tr></thead>
+                                    <tbody>
+                                        <tr><td class="p-2 border" colspan="4"><b>初期値:</b> P=2.46 atm, V=0.02 m³, T=600 K</td></tr>
+                                        <tr><td class="p-2 border">1</td><td class="p-2 border">断熱変化</td><td class="p-2 border">体積 V</td><td class="p-2 border">0.0566</td></tr>
+                                        <tr><td class="p-2 border">2</td><td class="p-2 border">等温変化</td><td class="p-2 border">体積 V</td><td class="p-2 border">0.113</td></tr>
+                                        <tr><td class="p-2 border">3</td><td class="p-2 border">断熱変化</td><td class="p-2 border">温度 T</td><td class="p-2 border">600</td></tr>
+                                        <tr><td class="p-2 border">4</td><td class="p-2 border">等温変化</td><td class="p-2 border">体積 V</td><td class="p-2 border">0.02</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                         </div>
+                    </div>
+
+                    <div class="mt-8 text-center">
+                        <h3 class="text-lg font-semibold mb-3">3. シミュレーション実行</h3>
+                        <button id="start-sim-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-lg transition-colors text-xl">サイクル開始</button>
+                        <button id="reset-sim-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg transition-colors text-xl ml-4">リセット</button>
+                        <p id="sim-result-notification" class="text-blue-600 mt-2 h-5"></p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="transition-diagram" class="content-section space-y-8">
+                <!-- 状態遷移図のコンテンツは変更なし -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-700">状態遷移図と気体の法則</h2>
+                    <p class="mb-6">シミュレーターで実行した最新の状態変化をまとめたものです。各状態（ストック）が、熱(Q)と仕事(W')というフローによってどのように変化（遷移）するかを確認できます。これらの変化は、気体の基本的な法則に基づいています。</p>
+                    <div class="flex items-center justify-center gap-4 mb-4 p-2 bg-gray-100 rounded">
+                        <span class="text-sm font-bold">凡例:</span>
+                        <span class="text-sm">低温/低U</span>
+                        <div class="w-32 h-4 rounded-full" style="background: linear-gradient(to right, hsl(240, 70%, 60%), hsl(180, 70%, 60%), hsl(120, 70%, 60%), hsl(60, 70%, 60%), hsl(0, 70%, 60%));"></div>
+                        <span class="text-sm">高温/高U</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <div id="diagram-container" class="flex items-start gap-2 p-4 bg-gray-50 rounded-lg min-h-[300px] w-max">
+                            <p id="diagram-placeholder" class="text-center text-gray-500">シミュレーターでサイクルを開始すると、ここに結果が表示されます。</p>
+                        </div>
+                    </div>
+                     <div class="grid md:grid-cols-2 gap-6 mt-6">
+                        <div class="formula p-4 rounded-md text-center">
+                             <h3 class="font-bold text-lg mb-2">ボイルの法則</h3>
+                             <p class="text-sm mb-2 text-left">温度が一定のとき、圧力(P)と体積(V)は反比例します。（等温変化）</p>
+                             <p>$PV = \text{一定}$</p>
+                        </div>
+                        <div class="formula p-4 rounded-md text-center">
+                            <h3 class="font-bold text-lg mb-2">シャルルの法則</h3>
+                            <p class="text-sm mb-2 text-left">圧力が一定のとき、体積(V)は絶対温度(T)に比例します。（定圧変化）</p>
+                             <p>$\frac{V}{T} = \text{一定}$</p>
+                        </div>
+                        <div class="formula p-4 rounded-md text-center">
+                             <h3 class="font-bold text-lg mb-2">ボイル・シャルルの法則</h3>
+                             <p class="text-sm mb-2 text-left">一定量の気体において、圧力(P)、体積(V)、絶対温度(T)の間には以下の関係が成り立ちます。</p>
+                             <p>$\frac{PV}{T} = \text{一定}$</p>
+                        </div>
+                        <div class="formula p-4 rounded-md text-center">
+                            <h3 class="font-bold text-lg mb-2">理想気体の状態方程式</h3>
+                            <p class="text-sm mb-2 text-left">ボイル・シャルルの法則を物質量(n)を用いて一般化した式です。このシミュレーションでは常にn=1molとして計算されています。</p>
+                             <p>$PV = nRT$</p>
+                        </div>
+                         <div class="formula p-4 rounded-md md:col-span-2 text-center">
+                            <h3 class="font-bold text-lg mb-2">ポアソンの法則</h3>
+                            <p class="text-sm mb-2 text-left">熱の出入りがない状態変化（断熱変化）では、圧力(P)と体積(V)の間に以下の関係が成り立ちます。$\gamma$（ガンマ）は比熱比とよばれる定数で、単原子分子の場合は約1.67です。</p>
+                             <p>$PV^\gamma = \text{一定}$</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="engine" class="content-section space-y-8">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-700">熱機関と熱力学第二法則</h2>
+                    <div class="formula p-4 rounded-md mb-8">
+                        <h3 class="font-bold text-lg mb-2">熱効率の一般式</h3>
+                        <p class="text-sm mb-2">熱効率(e)は、高温熱源から吸収した熱量($Q_{in}$)のうち、どれだけを外部への仕事(W')として取り出せたかを示す割合です。残りの熱量($Q_{out}$)は低温熱源へ排出されます。</p>
+                        <p class="text-center">$e = \frac{W'}{Q_{in}} = \frac{Q_{in} - Q_{out}}{Q_{in}} = 1 - \frac{Q_{out}}{Q_{in}}$</p>
+                    </div>
+
+                    <p class="mb-6">熱機関は、この熱効率の原理に基づき熱を仕事に変換する装置です。下のシミュレーターで、熱の出入りと仕事の関係をインタラクティブに確かめてみましょう。</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div class="text-center">
+                            <div class="relative w-64 h-80 mx-auto bg-gray-100 rounded-lg p-4 flex flex-col justify-between">
+                                <div class="bg-red-200 p-3 rounded">高温熱源 ($T_{high}$)</div>
+                                <div class="text-5xl self-center">↓</div>
+                                <div class="bg-white border-2 border-gray-400 p-4 rounded-lg">
+                                    <p class="font-bold text-lg">機関</p>
+                                    <p>仕事 W'</p>
+                                </div>
+                                <div class="text-5xl self-center">↓</div>
+                                <div class="bg-blue-200 p-3 rounded">低温熱源 ($T_{low}$)</div>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div>
+                                <label for="q_in" class="block font-semibold mb-1">吸収する熱量 ($Q_{in}$): <span id="q_in_val" class="font-bold text-blue-600">500</span> J</label>
+                                <input type="range" id="q_in" min="100" max="1000" value="500" class="w-full">
+                            </div>
+                            <div>
+                                <label for="q_out" class="block font-semibold mb-1">放出する熱量 ($Q_{out}$): <span id="q_out_val" class="font-bold text-blue-600">300</span> J</label>
+                                <input type="range" id="q_out" min="0" max="500" value="300" class="w-full">
+                            </div>
+                            <div class="bg-blue-50 p-6 rounded-lg text-center">
+                                <p class="text-lg">取り出せる仕事 (W'): <span id="work_val" class="font-bold text-2xl">200</span> J</p>
+                                <p class="text-lg mt-2">熱効率 (e): <span id="efficiency_val" class="font-bold text-2xl text-green-600">40.0</span> %</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-12 border-gray-300">
+
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-gray-700">カルノーサイクル：理想的な熱機関</h3>
+                        <div class="mb-4">
+                            <ol class="list-decimal list-inside space-y-2 text-sm">
+                                <li><b>A→B (等温膨張):</b> 高温熱源($T_{high}$)から熱$Q_{in}$を吸収し、外部に仕事をしながら膨張します。</li>
+                                <li><b>B→C (断熱膨張):</b> 熱の出入りなしに膨張し、温度が$T_{low}$まで下がります。この過程でも外部に仕事をします。</li>
+                                <li><b>C→D (等温圧縮):</b> 低温熱源($T_{low}$)に熱$Q_{out}$を放出しながら、外部から仕事をされて圧縮します。</li>
+                                <li><b>D→A (断熱圧縮):</b> 熱の出入りなしに圧縮され、温度が$T_{high}$に戻り、元の状態Aに戻ります。</li>
+                            </ol>
+                        </div>
+                        <div class="chart-container mx-auto mb-6">
+                            <canvas id="carnot-chart"></canvas>
+                        </div>
+                        <div class="mt-6 formula p-4 rounded-md">
+                            <h4 class="font-bold text-lg mb-2">カルノーサイクルの熱効率</h4>
+                            <p class="text-sm mb-2">カルノーサイクルの熱効率は、2つの熱源の絶対温度だけで決まり、理論上達成可能な最大の熱効率を与えます。</p>
+                            <p class="font-mono text-center text-lg my-2">$e = 1 - \frac{T_{low}}{T_{high}}$</p>
+                            <p class="text-sm mt-2">この式から、$T_{low}$を0K（絶対零度）にするか、$T_{high}$を無限大にしない限り、熱効率eは決して1 (100%) にはならないことがわかります。</p>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-12 border-gray-300">
+                    
+                    <!-- ヒートポンプシミュレーション -->
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-gray-700">ヒートポンプシミュレーター</h3>
+                        <p class="mb-6">ヒートポンプは、熱機関と逆の働きをします。外部から仕事(W)を投入することで、低温側から熱($Q_{low}$)を汲み上げ、高温側へ熱($Q_{high}$)を放出します。エアコンの冷房・暖房機能はこの原理に基づいています。</p>
+                        <div class="formula p-4 rounded-md mb-6 border-l-sky-500">
+                            <h4 class="font-bold text-lg mb-2">ポンプ（圧縮機）の役割と冷媒</h4>
+                            <p class="text-sm mb-2">ヒートポンプの心臓部がポンプ（圧縮機）です。シミュレーターで「投入する仕事(W)」とは、このポンプが**冷媒**（熱を運ぶ物質）に対して行う仕事のことです。ポンプは冷媒を圧縮して圧力と温度を急上昇させます。これにより、冷媒は（暖房の場合）室内よりも熱くなり、効率的に熱を放出できるようになります。逆に冷媒が膨張すると温度が急低下し、（冷房の場合）室外よりも冷たくなって熱を吸収できるのです。</p>
+                            <p class="text-sm mt-2">エアコンで使われる冷媒は、かつてはオゾン層を破壊するフロン類（R22など）が主流でしたが、現在は規制により、オゾン層を破壊せず、地球温暖化への影響がより少ない代替フロン（R32など）が使われています。このように、冷媒の選択は環境問題と密接に関わっています。</p>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div class="relative h-[400px]">
+                                <canvas id="heat-pump-canvas" class="w-full h-full"></canvas>
+                            </div>
+                            <div class="space-y-6">
+                                <div>
+                                    <label for="work-input-slider" class="block font-semibold mb-1">投入する仕事 (W): <span id="work-input-val" class="font-bold text-blue-600">50</span> J</label>
+                                    <input type="range" id="work-input-slider" min="10" max="200" value="50" class="w-full">
+                                </div>
+                                <div class="text-center">
+                                    <span class="font-semibold">運転モード:</span>
+                                    <div class="mt-2 inline-flex rounded-md shadow-sm" role="group">
+                                        <button type="button" id="cooling-mode-btn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-gray-200 rounded-l-lg hover:bg-blue-700">
+                                            冷房
+                                        </button>
+                                        <button type="button" id="heating-mode-btn" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100">
+                                            暖房
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="bg-blue-50 p-6 rounded-lg text-center space-y-2">
+                                    <p class="text-lg">低温側から吸収する熱 ($Q_{low}$): <span id="q-low-val" class="font-bold text-2xl">150</span> J</p>
+                                    <p class="text-lg">高温側へ放出する熱 ($Q_{high}$): <span id="q-high-val" class="font-bold text-2xl">200</span> J</p>
+                                    <p class="text-lg mt-2">成績係数 (COP): <span id="cop-val" class="font-bold text-2xl text-green-600">3.0</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-8 formula p-4 rounded-md">
+                            <h4 class="font-bold text-lg mb-2">成績係数 (COP) の詳細</h4>
+                            <p class="text-sm mb-2">ヒートポンプの効率は、投入した仕事に対してどれだけの熱を移動できたかを示す**成績係数(COP: Coefficient of Performance)**で評価されます。COPは1より大きくなることがあり、投入したエネルギー以上の熱量を移動できる効率的なシステムであることを意味します。</p>
+                            <div class="grid md:grid-cols-2 gap-4 mt-4">
+                                <div>
+                                    <p class="font-bold">冷房の場合 (低温側を冷やす):</p>
+                                    <p class="text-center my-2">$COP_{cooling} = \frac{Q_{low}}{W}$</p>
+                                    <p class="text-sm">理想的な逆カルノーサイクルでは、COPは熱源の絶対温度だけで決まります。</p>
+                                    <p class="text-center mt-2">$COP_{cooling, ideal} = \frac{T_{low}}{T_{high} - T_{low}}$</p>
+                                </div>
+                                <div>
+                                    <p class="font-bold">暖房の場合 (高温側を暖める):</p>
+                                    <p class="text-center my-2">$COP_{heating} = \frac{Q_{high}}{W} = \frac{Q_{low} + W}{W}$</p>
+                                     <p class="text-sm">同様に、理想的な場合のCOPは以下のようになります。</p>
+                                    <p class="text-center mt-2">$COP_{heating, ideal} = \frac{T_{high}}{T_{high} - T_{low}}$</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-12 border-gray-300">
+
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-gray-700">理想的なヒートポンプ：逆カルノーサイクル</h3>
+                        <p class="mb-4">ヒートポンプの理想的なサイクルは、カルノーサイクルを逆向きに運転する**逆カルノーサイクル**で表されます。P-V図上では、カルノーサイクルが時計回りなのに対し、逆カルノーサイクルは反時計回りに状態が変化します。これは、外部から仕事を「投入」して熱を汲み上げることを意味します。</p>
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <ol class="list-decimal list-inside space-y-2 text-sm">
+                                    <li><b>A→D (断熱膨張):</b> 冷媒を断熱的に膨張させ、温度を低温熱源($T_{low}$)よりさらに低くします。</li>
+                                    <li><b>D→C (等温膨張):</b> 低温熱源から熱$Q_{low}$を吸収しながら、等温で膨張します。（例：冷房時の室内）</li>
+                                    <li><b>C→B (断熱圧縮):</b> ポンプ（圧縮機）が仕事をし、冷媒を断熱的に圧縮して温度を高温熱源($T_{high}$)より高くします。</li>
+                                    <li><b>B→A (等温圧縮):</b> 高温熱源へ熱$Q_{high}$を放出しながら、等温で圧縮され、元の状態Aに戻ります。（例：冷房時の室外）</li>
+                                </ol>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-center mb-2">サイクルビルダーでの再現例</h4>
+                                <table class="w-full text-sm text-left border-collapse">
+                                    <thead><tr class="bg-gray-200"><th class="p-2 border">ステップ</th><th class="p-2 border">プロセス</th><th class="p-2 border">設定</th><th class="p-2 border">値</th></tr></thead>
+                                    <tbody>
+                                        <tr><td class="p-2 border" colspan="4"><b>初期値:</b> P=2.46 atm, V=0.02 m³, T=600 K</td></tr>
+                                        <tr><td class="p-2 border">1</td><td class="p-2 border">断熱変化</td><td class="p-2 border">体積 V</td><td class="p-2 border">0.0566</td></tr>
+                                        <tr><td class="p-2 border">2</td><td class="p-2 border">等温変化</td><td class="p-2 border">体積 V</td><td class="p-2 border">0.113</td></tr>
+                                        <tr><td class="p-2 border">3</td><td class="p-2 border">断熱変化</td><td class="p-2 border">温度 T</td><td class="p-2 border">600</td></tr>
+                                        <tr><td class="p-2 border">4</td><td class="p-2 border">等温変化</td><td class="p-2 border">体積 V</td><td class="p-2 border">0.02</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-12 border-gray-300">
+
+                    <div>
+                         <h3 class="text-2xl font-bold mb-4 text-gray-700">永久機関はなぜ不可能か？</h3>
+                         <div class="grid md:grid-cols-2 gap-6">
+                            <div class="formula p-4 rounded-md border-l-red-500">
+                                <h4 class="font-bold text-lg mb-2">第一種永久機関</h4>
+                                <p class="text-sm">外部からエネルギーを受け取ることなく、仕事を永久に作り出し続ける装置です。これは、エネルギー保存則である**熱力学第一法則 ($\Delta U = Q + W$)** に反するため、実現不可能です。</p>
+                            </div>
+                            <div class="formula p-4 rounded-md border-l-red-500">
+                                <h4 class="font-bold text-lg mb-2">第二種永久機関</h4>
+                                <p class="text-sm">一つの熱源から吸収した熱を100%仕事に変換する装置です。これは、熱は必ず高温から低温へ流れるという**熱力学第二法則**に反するため、実現不可能です。カルノーサイクルの熱効率の式が示すように、熱を捨てる低温熱源がなければ熱機関は作動できません。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // KaTeX auto-rendering
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\(", right: "\\)", display: false},
+                    {left: "\\[", right: "\\]", display: true}
+                ]
+            });
+
+            let activeTab = 'basics';
+            const tabs = document.querySelectorAll('.tab-button');
+            const sections = document.querySelectorAll('.content-section');
+            const navTabs = document.getElementById('nav-tabs');
+            let microSimAnimationId = null;
+            let engineSimAnimationId = null;
+            let lastSimulationStates = null;
+            let lastSimulationPVPath = null;
+            let lastSimulationVTPath = null;
+            
+            // --- Micro Sim ---
+            let microCanvas, microCtx, pressureDisplay, keDisplay, tempDisplay, heatUpBtnGas, coolDownBtnGas, energyBar;
+            let gasMolecules = [];
+            const numGasMolecules = 50;
+            let gasCollisionCount = 0;
+            let gasPressureInterval;
+            
+            let brownianCanvas, brownianCtx, boltzmannCanvas, brownianTempDisplay, heatUpBtnBoltzmann, coolDownBtnBoltzmann, restartBrownianBtn, traceCheckbox, showWaterCheckbox, holdDistBtn;
+            let waterMolecules = [];
+            let brownianParticle = {};
+            let tracePoints = [];
+            let baseSpeed = 2;
+            let boltzmannChart;
+            let carnotChart = null;
+
+            // --- Brownian Distribution Sim ---
+            let brownianDistCanvas, brownianDistCtx, normalDistChartCanvas, normalDistChart, showDistMediumCheckbox;
+            let distParticles = [], distMediumMolecules = [];
+            let distSimRunning = false;
+            let distAnimationId = null;
+            const numDistParticles = 500;
+            const simulationSteps = 150;
+            let currentStep = 0;
+
+            // --- Heat Pump Sim ---
+            let heatPumpCanvas, heatPumpCtx, workInputSlider, coolingModeBtn, heatingModeBtn;
+            let heatParticles = [];
+            let heatPumpMode = 'cooling'; // 'cooling' or 'heating'
+
+            function startSimulationsForTab(tabId) {
+                stopAllSimulations();
+                if (tabId === 'micro') {
+                    startMicroSim();
+                } else if (tabId === 'engine') {
+                    startEngineSim();
+                }
+            }
+
+            function stopAllSimulations() {
+                if (microSimAnimationId) {
+                    cancelAnimationFrame(microSimAnimationId);
+                    microSimAnimationId = null;
+                }
+                 if (distAnimationId) {
+                    cancelAnimationFrame(distAnimationId);
+                    distAnimationId = null;
+                }
+                if (engineSimAnimationId) {
+                    cancelAnimationFrame(engineSimAnimationId);
+                    engineSimAnimationId = null;
+                }
+                if (gasPressureInterval) clearInterval(gasPressureInterval);
+                distSimRunning = false;
+            }
+
+            function startMicroSim() {
+                if (microSimAnimationId) return;
+                
+                // Gas Sim Elements
+                microCanvas = document.getElementById('molecule-canvas');
+                microCtx = microCanvas.getContext('2d');
+                pressureDisplay = document.getElementById('pressure-display');
+                keDisplay = document.getElementById('ke-display');
+                tempDisplay = document.getElementById('temp-display');
+                heatUpBtnGas = document.getElementById('heat-up-btn-gas');
+                coolDownBtnGas = document.getElementById('cool-down-btn-gas');
+                energyBar = document.getElementById('energy-bar');
+
+                // Brownian Sim Elements
+                brownianCanvas = document.getElementById('brownian-canvas');
+                brownianCtx = brownianCanvas.getContext('2d');
+                boltzmannCanvas = document.getElementById('boltzmann-chart');
+                brownianTempDisplay = document.getElementById('brownian-temp-display');
+                heatUpBtnBoltzmann = document.getElementById('heat-up-btn-boltzmann');
+                coolDownBtnBoltzmann = document.getElementById('cool-down-btn-boltzmann');
+                restartBrownianBtn = document.getElementById('restart-brownian-btn');
+                traceCheckbox = document.getElementById('trace-checkbox');
+                showWaterCheckbox = document.getElementById('show-water-checkbox');
+                holdDistBtn = document.getElementById('hold-dist-btn');
+
+                // Brownian Distribution Sim Elements
+                document.getElementById('start-dist-sim-btn').addEventListener('click', startDistSim);
+                document.getElementById('reset-dist-sim-btn').addEventListener('click', resetDistSim);
+
+                // Attach Listeners
+                heatUpBtnGas.addEventListener('click', () => { gasMolecules.forEach(m => { m.vx *= 1.2; m.vy *= 1.2; }); });
+                coolDownBtnGas.addEventListener('click', () => { gasMolecules.forEach(m => { m.vx *= 0.8; m.vy *= 0.8; }); });
+                heatUpBtnBoltzmann.addEventListener('click', () => { baseSpeed *= 1.2; waterMolecules.forEach(m => { m.vx *= 1.2; m.vy *= 1.2; }); brownianTempDisplay.textContent = (baseSpeed**2 * 75).toFixed(0); });
+                coolDownBtnBoltzmann.addEventListener('click', () => { baseSpeed *= 0.8; waterMolecules.forEach(m => { m.vx *= 0.8; m.vy *= 0.8; }); brownianTempDisplay.textContent = (baseSpeed**2 * 75).toFixed(0); });
+                restartBrownianBtn.addEventListener('click', initBrownianSim);
+                holdDistBtn.addEventListener('click', () => updateBoltzmannChart(true));
+
+
+                // Gas Sim Init
+                microCanvas.width = microCanvas.clientWidth;
+                microCanvas.height = microCanvas.clientHeight;
+                gasMolecules = [];
+                for (let i = 0; i < numGasMolecules; i++) {
+                    gasMolecules.push({
+                        x: Math.random() * microCanvas.width,
+                        y: Math.random() * microCanvas.height,
+                        vx: (Math.random() - 0.5) * 4,
+                        vy: (Math.random() - 0.5) * 4,
+                        radius: 5,
+                    });
+                }
+                gasPressureInterval = setInterval(() => {
+                    pressureDisplay.textContent = gasCollisionCount;
+                    gasCollisionCount = 0;
+                }, 1000);
+
+                // Brownian Sim Init
+                brownianCanvas.width = brownianCanvas.clientWidth;
+                brownianCanvas.height = brownianCanvas.clientHeight;
+                initBrownianSim();
+                if (boltzmannChart) boltzmannChart.destroy();
+                boltzmannChart = new Chart(boltzmannCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: { labels: [], datasets: [
+                        { label: '現在の分布', data: [], backgroundColor: 'rgba(54, 162, 235, 0.6)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 1, order: 2 },
+                        { label: '保持した分布', data: [], backgroundColor: 'rgba(201, 203, 207, 0.6)', borderColor: 'rgba(201, 203, 207, 1)', borderWidth: 1, order: 1 }
+                    ] },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, title: { display: true, text: '分子の数' } }, x: { title: { display: true, text: '速さ' } } } }
+                });
+                
+                initDistSim();
+                animateMicro();
+            }
+            
+            function animateMicro() {
+                // Gas Sim
+                microCtx.clearRect(0, 0, microCanvas.width, microCanvas.height);
+                let totalKE = 0;
+                gasMolecules.forEach(m => {
+                    m.x += m.vx;
+                    m.y += m.vy;
+                    if (m.x - m.radius < 0 || m.x + m.radius > microCanvas.width) { m.vx *= -1; gasCollisionCount++; }
+                    if (m.y - m.radius < 0 || m.y + m.radius > microCanvas.height) { m.vy *= -1; gasCollisionCount++; }
+                    const speed = Math.sqrt(m.vx*m.vx + m.vy*m.vy);
+                    const hue = 240 - Math.min(speed * 20, 240);
+                    microCtx.beginPath();
+                    microCtx.arc(m.x, m.y, m.radius, 0, Math.PI * 2);
+                    microCtx.fillStyle = `hsl(${hue}, 80%, 50%)`;
+                    microCtx.fill();
+                    totalKE += 0.5 * (m.vx * m.vx + m.vy * m.vy);
+                });
+                const avgKE = totalKE / numGasMolecules;
+                keDisplay.textContent = avgKE.toFixed(2);
+                const temp = avgKE * 25;
+                tempDisplay.textContent = temp.toFixed(0);
+                energyBar.style.width = `${Math.min(temp / 5, 100)}%`;
+
+                // Brownian Sim
+                brownianCtx.clearRect(0, 0, brownianCanvas.width, brownianCanvas.height);
+                if (traceCheckbox.checked) {
+                    brownianCtx.beginPath();
+                    brownianCtx.moveTo(tracePoints[0].x, tracePoints[0].y);
+                    for (let i = 1; i < tracePoints.length; i++) { brownianCtx.lineTo(tracePoints[i].x, tracePoints[i].y); }
+                    brownianCtx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+                    brownianCtx.stroke();
+                }
+                waterMolecules.forEach(m => {
+                    m.x += m.vx; m.y += m.vy;
+                    if (m.x < 0 || m.x > brownianCanvas.width) m.vx *= -1;
+                    if (m.y < 0 || m.y > brownianCanvas.height) m.vy *= -1;
+                    const dx = m.x - brownianParticle.x; const dy = m.y - brownianParticle.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < m.radius + brownianParticle.radius) {
+                        const angle = Math.atan2(dy, dx);
+                        const overlap = m.radius + brownianParticle.radius - dist;
+                        m.x += Math.cos(angle) * overlap / 2; m.y += Math.sin(angle) * overlap / 2;
+                        const tempVx = m.vx; const tempVy = m.vy;
+                        m.vx = brownianParticle.vx; m.vy = brownianParticle.vy;
+                        brownianParticle.vx = tempVx; brownianParticle.vy = tempVy;
+                    }
+                    if (showWaterCheckbox.checked) {
+                        brownianCtx.beginPath();
+                        brownianCtx.arc(m.x, m.y, m.radius, 0, Math.PI * 2);
+                        brownianCtx.fillStyle = 'rgba(54, 162, 235, 0.6)';
+                        brownianCtx.fill();
+                    }
+                });
+                brownianParticle.x += brownianParticle.vx; brownianParticle.y += brownianParticle.vy;
+                if (brownianParticle.x - brownianParticle.radius < 0) { brownianParticle.vx *= -1; brownianParticle.x = brownianParticle.radius; }
+                if (brownianParticle.x + brownianParticle.radius > brownianCanvas.width) { brownianParticle.vx *= -1; brownianParticle.x = brownianCanvas.width - brownianParticle.radius; }
+                if (brownianParticle.y - brownianParticle.radius < 0) { brownianParticle.vy *= -1; brownianParticle.y = brownianParticle.radius; }
+                if (brownianParticle.y + brownianParticle.radius > brownianCanvas.height) { brownianParticle.vy *= -1; brownianParticle.y = brownianCanvas.height - brownianParticle.radius; }
+                brownianParticle.vx *= 0.99; brownianParticle.vy *= 0.99;
+                if (tracePoints[tracePoints.length - 1].x !== brownianParticle.x || tracePoints[tracePoints.length - 1].y !== brownianParticle.y) {
+                    tracePoints.push({x: brownianParticle.x, y: brownianParticle.y});
+                    if (tracePoints.length > 200) tracePoints.shift();
+                }
+                brownianCtx.beginPath();
+                brownianCtx.arc(brownianParticle.x, brownianParticle.y, brownianParticle.radius, 0, Math.PI * 2);
+                brownianCtx.fillStyle = 'rgba(255, 215, 0, 1)'; brownianCtx.fill();
+                brownianCtx.strokeStyle = 'rgba(218, 165, 32, 1)'; brownianCtx.stroke();
+                updateBoltzmannChart();
+
+                microSimAnimationId = requestAnimationFrame(animateMicro);
+            }
+            
+            function initBrownianSim() {
+                waterMolecules = [];
+                const numWaterMolecules = 100;
+                for (let i = 0; i < numWaterMolecules; i++) {
+                    waterMolecules.push({
+                        x: Math.random() * brownianCanvas.width, y: Math.random() * brownianCanvas.height,
+                        vx: (Math.random() - 0.5) * baseSpeed, vy: (Math.random() - 0.5) * baseSpeed,
+                        radius: 2,
+                    });
+                }
+                brownianParticle = { x: brownianCanvas.width / 2, y: brownianCanvas.height / 2, vx: 0, vy: 0, radius: 10, mass: 100 };
+                tracePoints = [{x: brownianParticle.x, y: brownianParticle.y}];
+                brownianTempDisplay.textContent = (baseSpeed**2 * 75).toFixed(0);
+            }
+            
+            function updateBoltzmannChart(hold = false) {
+                const speeds = waterMolecules.map(m => Math.sqrt(m.vx**2 + m.vy**2));
+                const maxSpeed = 15;
+                const binSize = 1.5;
+                const bins = new Array(10).fill(0);
+                const labels = [];
+                speeds.forEach(speed => {
+                    const binIndex = Math.min(Math.floor(speed / binSize), 9);
+                    if(binIndex >= 0) {
+                       bins[binIndex]++;
+                    }
+                });
+                for(let i=0; i<10; i++) { labels.push(`${(i*binSize).toFixed(1)}-`); }
+                
+                if (hold) {
+                     boltzmannChart.data.datasets[1].data = bins;
+                     boltzmannChart.data.datasets[1].labels = labels;
+                } else {
+                    boltzmannChart.data.labels = labels;
+                    boltzmannChart.data.datasets[0].data = bins;
+                }
+                boltzmannChart.update();
+            }
+
+            // --- Brownian Distribution Sim Functions ---
+            function initDistSim() {
+                brownianDistCanvas = document.getElementById('brownian-dist-canvas');
+                brownianDistCtx = brownianDistCanvas.getContext('2d');
+                normalDistChartCanvas = document.getElementById('normal-dist-chart');
+                showDistMediumCheckbox = document.getElementById('show-dist-medium-checkbox');
+
+                brownianDistCanvas.width = brownianDistCanvas.clientWidth;
+                brownianDistCanvas.height = brownianDistCanvas.clientHeight;
+
+                if (normalDistChart) normalDistChart.destroy();
+                normalDistChart = new Chart(normalDistChartCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: { labels: [], datasets: [{ label: '粒子数', data: [] }] },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true, title: { display: true, text: '粒子数' } }, x: { title: { display: true, text: '水平位置' } } },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+                resetDistSim();
+            }
+            
+            function resetDistSim() {
+                distSimRunning = false;
+                if (distAnimationId) cancelAnimationFrame(distAnimationId);
+                distAnimationId = null;
+                currentStep = 0;
+                document.getElementById('trial-count-display').textContent = '0';
+                
+                distParticles = [];
+                distMediumMolecules = [];
+                const startX = brownianDistCanvas.width / 2;
+                const startY = brownianDistCanvas.height / 2;
+                for (let i = 0; i < numDistParticles; i++) {
+                    distParticles.push({ x: startX, y: startY, final: false });
+                }
+                 for (let i = 0; i < 100; i++) {
+                    distMediumMolecules.push({
+                        x: Math.random() * brownianDistCanvas.width,
+                        y: Math.random() * brownianDistCanvas.height,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2,
+                        radius: 2
+                    });
+                }
+                
+                brownianDistCtx.clearRect(0, 0, brownianDistCanvas.width, brownianDistCanvas.height);
+                brownianDistCtx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                distParticles.forEach(p => {
+                    brownianDistCtx.beginPath();
+                    brownianDistCtx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+                    brownianDistCtx.fill();
+                });
+
+                normalDistChart.data.labels = [];
+                normalDistChart.data.datasets[0].data = [];
+                normalDistChart.update();
+            }
+
+            function startDistSim() {
+                if (distSimRunning) return;
+                resetDistSim();
+                distSimRunning = true;
+                animateDistSim();
+            }
+
+            function animateDistSim() {
+                if (!distSimRunning || currentStep >= simulationSteps) {
+                    distSimRunning = false;
+                    updateDistributionChart();
+                    return;
+                }
+
+                brownianDistCtx.clearRect(0, 0, brownianDistCanvas.width, brownianDistCanvas.height);
+                
+                if (showDistMediumCheckbox.checked) {
+                    distMediumMolecules.forEach(m => {
+                        m.x += m.vx;
+                        m.y += m.vy;
+                        if (m.x < 0 || m.x > brownianDistCanvas.width) m.vx *= -1;
+                        if (m.y < 0 || m.y > brownianDistCanvas.height) m.vy *= -1;
+                        brownianDistCtx.beginPath();
+                        brownianDistCtx.arc(m.x, m.y, m.radius, 0, Math.PI * 2);
+                        brownianDistCtx.fillStyle = 'rgba(54, 162, 235, 0.2)';
+                        brownianDistCtx.fill();
+                    });
+                }
+
+                brownianDistCtx.fillStyle = `rgba(0, 0, 0, ${0.5 - 0.4 * (currentStep/simulationSteps)})`;
+                distParticles.forEach(p => {
+                    if (!p.final) {
+                        p.x += (Math.random() - 0.5) * 4;
+                        p.y += (Math.random() - 0.5) * 4;
+                        p.x = Math.max(2, Math.min(brownianDistCanvas.width - 2, p.x));
+                        p.y = Math.max(2, Math.min(brownianDistCanvas.height - 2, p.y));
+                    }
+                    brownianDistCtx.beginPath();
+                    brownianDistCtx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+                    brownianDistCtx.fill();
+                });
+
+                currentStep++;
+                if (currentStep >= simulationSteps) {
+                    distParticles.forEach(p => p.final = true);
+                }
+
+                distAnimationId = requestAnimationFrame(animateDistSim);
+            }
+            
+            function redrawDistParticlesWithColor(bins, binWidth, maxInBin) {
+                brownianDistCtx.clearRect(0, 0, brownianDistCanvas.width, brownianDistCanvas.height);
+                distParticles.forEach(p => {
+                    const binIndex = Math.floor(p.x / binWidth);
+                    const countInBin = (binIndex >= 0 && binIndex < bins.length) ? bins[binIndex] : 0;
+                    const ratio = maxInBin > 0 ? countInBin / maxInBin : 0;
+                    const hue = 240 * (1 - ratio); // 240 (blue) to 0 (red)
+                    
+                    brownianDistCtx.fillStyle = `hsl(${hue}, 90%, 50%)`;
+                    brownianDistCtx.beginPath();
+                    brownianDistCtx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+                    brownianDistCtx.fill();
+                });
+            }
+
+            function updateDistributionChart() {
+                const finalXPositions = distParticles.map(p => p.x);
+                const numBins = 20;
+                const binWidth = brownianDistCanvas.width / numBins;
+                const bins = new Array(numBins).fill(0);
+                const labels = [];
+
+                finalXPositions.forEach(pos => {
+                    const binIndex = Math.floor(pos / binWidth);
+                    if (binIndex >= 0 && binIndex < numBins) {
+                        bins[binIndex]++;
+                    }
+                });
+
+                for (let i = 0; i < numBins; i++) {
+                    labels.push(`${(i * binWidth).toFixed(0)}`);
+                }
+                
+                const maxInBin = Math.max(...bins);
+                const barColors = bins.map(count => {
+                    const ratio = maxInBin > 0 ? count / maxInBin : 0;
+                    const hue = 240 * (1 - ratio); // 240 (blue) to 0 (red)
+                    return `hsl(${hue}, 90%, 50%)`;
+                });
+
+                document.getElementById('trial-count-display').textContent = numDistParticles;
+                normalDistChart.data.labels = labels;
+                normalDistChart.data.datasets[0].data = bins;
+                normalDistChart.data.datasets[0].backgroundColor = barColors;
+                normalDistChart.update();
+                
+                redrawDistParticlesWithColor(bins, binWidth, maxInBin);
+            }
+
+            // --- Engine Sim Functions ---
+            function startEngineSim() {
+                if (engineSimAnimationId) return;
+
+                drawCarnotCycle();
+
+                heatPumpCanvas = document.getElementById('heat-pump-canvas');
+                heatPumpCtx = heatPumpCanvas.getContext('2d');
+                workInputSlider = document.getElementById('work-input-slider');
+                coolingModeBtn = document.getElementById('cooling-mode-btn');
+                heatingModeBtn = document.getElementById('heating-mode-btn');
+
+                heatPumpCanvas.width = heatPumpCanvas.clientWidth;
+                heatPumpCanvas.height = heatPumpCanvas.clientHeight;
+
+                workInputSlider.addEventListener('input', updateHeatPumpValues);
+                coolingModeBtn.addEventListener('click', () => setHeatPumpMode('cooling'));
+                heatingModeBtn.addEventListener('click', () => setHeatPumpMode('heating'));
+                
+                initHeatPumpParticles();
+                updateHeatPumpValues();
+                animateEngine();
+            }
+            
+            function initHeatPumpParticles() {
+                heatParticles = [];
+                for (let i = 0; i < 50; i++) {
+                    heatParticles.push({
+                        x: Math.random() * heatPumpCanvas.width,
+                        y: Math.random() * heatPumpCanvas.height,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: 0,
+                        radius: 3,
+                        type: Math.random() > 0.5 ? 'cold' : 'hot'
+                    });
+                }
+            }
+
+            function setHeatPumpMode(mode) {
+                heatPumpMode = mode;
+                if (mode === 'cooling') {
+                    coolingModeBtn.classList.add('bg-blue-600', 'text-white');
+                    coolingModeBtn.classList.remove('bg-white', 'text-gray-900');
+                    heatingModeBtn.classList.add('bg-white', 'text-gray-900');
+                    heatingModeBtn.classList.remove('bg-red-600', 'text-white');
+                } else {
+                    heatingModeBtn.classList.add('bg-red-600', 'text-white');
+                    heatingModeBtn.classList.remove('bg-white', 'text-gray-900');
+                    coolingModeBtn.classList.add('bg-white', 'text-gray-900');
+                    coolingModeBtn.classList.remove('bg-blue-600', 'text-white');
+                }
+                updateHeatPumpValues();
+            }
+
+            function updateHeatPumpValues() {
+                const work = parseFloat(workInputSlider.value);
+                // Simplified COP model for visualization
+                const cop_cooling = 300 / work; 
+                const q_low = cop_cooling * work;
+                const q_high = q_low + work;
+                const cop_heating = q_high / work;
+
+                document.getElementById('work-input-val').textContent = work.toFixed(0);
+                document.getElementById('q-low-val').textContent = q_low.toFixed(0);
+                document.getElementById('q-high-val').textContent = q_high.toFixed(0);
+                
+                if (heatPumpMode === 'cooling') {
+                    document.getElementById('cop-val').textContent = cop_cooling.toFixed(1);
+                } else {
+                    document.getElementById('cop-val').textContent = cop_heating.toFixed(1);
+                }
+            }
+
+            function animateEngine() {
+                // Heat Pump Sim
+                const w = heatPumpCanvas.width;
+                const h = heatPumpCanvas.height;
+                heatPumpCtx.clearRect(0, 0, w, h);
+
+                const work = parseFloat(workInputSlider.value);
+                const pumpSpeed = work / 50;
+
+                // Draw zones
+                const roomY = h * 0.3;
+                const outsideY = h * 0.7;
+                const roomColor = heatPumpMode === 'cooling' ? '#aed6f1' : '#f5b7b1'; // Cool blue or warm red
+                const outsideColor = heatPumpMode === 'cooling' ? '#f5b7b1' : '#aed6f1';
+
+                heatPumpCtx.fillStyle = roomColor;
+                heatPumpCtx.fillRect(0, 0, w, roomY);
+                heatPumpCtx.fillStyle = outsideColor;
+                heatPumpCtx.fillRect(0, outsideY, w, h - outsideY);
+
+                heatPumpCtx.fillStyle = '#333';
+                heatPumpCtx.font = 'bold 16px sans-serif';
+                heatPumpCtx.textAlign = 'center';
+                const roomText = heatPumpMode === 'cooling' ? '室内 (冷却中)' : '室内 (暖房中)';
+                const outsideText = heatPumpMode === 'cooling' ? '室外 (放熱中)' : '室外 (吸熱中)';
+                heatPumpCtx.fillText(roomText, w / 2, 30);
+                heatPumpCtx.fillText(outsideText, w / 2, h - 20);
+
+                // Draw pump
+                heatPumpCtx.fillStyle = '#6c757d';
+                heatPumpCtx.fillRect(w/2 - 50, roomY, 100, outsideY - roomY);
+                heatPumpCtx.fillStyle = '#fff';
+                heatPumpCtx.fillText('ポンプ', w/2, h/2 - 10);
+                heatPumpCtx.fillText(`W=${work.toFixed(0)}`, w/2, h/2 + 15);
+
+                // Animate particles
+                heatParticles.forEach(p => {
+                    if (heatPumpMode === 'cooling') {
+                        p.vy = -pumpSpeed; // Move heat from room to outside
+                        if (p.y < roomY) p.type = 'hot';
+                        if (p.y > outsideY) p.type = 'cold';
+                    } else {
+                        p.vy = pumpSpeed; // Move heat from outside to room
+                        if (p.y < roomY) p.type = 'cold';
+                        if (p.y > outsideY) p.type = 'hot';
+                    }
+
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0 || p.x > w) p.vx *= -1;
+                    if (p.y < 0) p.y = h;
+                    if (p.y > h) p.y = 0;
+
+                    heatPumpCtx.beginPath();
+                    heatPumpCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    heatPumpCtx.fillStyle = p.type === 'hot' ? 'rgba(255, 0, 0, 0.7)' : 'rgba(0, 0, 255, 0.7)';
+                    heatPumpCtx.fill();
+                });
+
+                engineSimAnimationId = requestAnimationFrame(animateEngine);
+            }
+
+            function drawCarnotCycle() {
+                if (carnotChart) { 
+                    return;
+                }
+                const carnotCanvas = document.getElementById('carnot-chart');
+                if (!carnotCanvas) return;
+                const carnotCtx = carnotCanvas.getContext('2d');
+
+                const T_high = 600;
+                const T_low = 300;
+                const gamma = 5/3;
+                const nR = 8.31;
+                const ATM_TO_PA = 101325;
+
+                const V_A = 1.0;
+                const P_A = nR * T_high / V_A;
+
+                const V_B = 2.0;
+                const P_B = nR * T_high / V_B;
+
+                const V_C = V_B * Math.pow(T_high / T_low, 1 / (gamma - 1));
+                const P_C = nR * T_low / V_C;
+
+                const V_D = V_A * Math.pow(T_high / T_low, 1 / (gamma - 1));
+                const P_D = nR * T_low / V_D;
+
+                const isothermal1 = [];
+                for (let v = V_A; v <= V_B; v += (V_B - V_A) / 20) {
+                    isothermal1.push({x: v, y: (nR * T_high / v) / ATM_TO_PA});
+                }
+
+                const adiabatic1 = [];
+                const k_bc = P_B * Math.pow(V_B, gamma);
+                for (let v = V_B; v <= V_C; v += (V_C - V_B) / 20) {
+                    adiabatic1.push({x: v, y: (k_bc / Math.pow(v, gamma)) / ATM_TO_PA});
+                }
+
+                const isothermal2 = [];
+                for (let v = V_C; v >= V_D; v -= (V_C - V_D) / 20) {
+                    isothermal2.push({x: v, y: (nR * T_low / v) / ATM_TO_PA});
+                }
+
+                const adiabatic2 = [];
+                const k_da = P_D * Math.pow(V_D, gamma);
+                for (let v = V_D; v >= V_A; v -= (V_D - V_A) / 20) {
+                    adiabatic2.push({x: v, y: (k_da / Math.pow(v, gamma)) / ATM_TO_PA});
+                }
+                adiabatic2.push({x: V_A, y: P_A / ATM_TO_PA});
+
+
+                carnotChart = new Chart(carnotCtx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            { label: 'A→B 等温膨張 (T_high)', data: isothermal1, borderColor: 'red', showLine: true, pointRadius: 0, tension: 0.1 },
+                            { label: 'B→C 断熱膨張', data: adiabatic1, borderColor: 'orange', showLine: true, pointRadius: 0, tension: 0.1 },
+                            { label: 'C→D 等温圧縮 (T_low)', data: isothermal2, borderColor: 'blue', showLine: true, pointRadius: 0, tension: 0.1 },
+                            { label: 'D→A 断熱圧縮', data: adiabatic2, borderColor: 'purple', showLine: true, pointRadius: 0, tension: 0.1 },
+                            { label: '状態点', data: [{x:V_A, y:P_A/ATM_TO_PA}, {x:V_B, y:P_B/ATM_TO_PA}, {x:V_C, y:P_C/ATM_TO_PA}, {x:V_D, y:P_D/ATM_TO_PA}], backgroundColor: 'black', pointRadius: 4, showLine: false }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { boxWidth: 12 } },
+                            title: { display: true, text: 'カルノーサイクルのP-V図' }
+                        },
+                        scales: {
+                            x: { title: { display: true, text: '体積 V (任意単位)' } },
+                            y: { title: { display: true, text: '圧力 P (atm)' } }
+                        }
+                    }
+                });
+            }
+            
+            function showTab(tabId) {
+                activeTab = tabId;
+                sections.forEach(section => { section.classList.remove('active'); });
+                tabs.forEach(tab => { tab.classList.remove('active'); });
+                document.getElementById(tabId).classList.add('active');
+                document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+                
+                startSimulationsForTab(tabId);
+
+                if (tabId === 'simulator' || tabId === 'transition-diagram') {
+                    if (lastSimulationPVPath) {
+                        drawStaticCycles(lastSimulationStates, lastSimulationPVPath, lastSimulationVTPath);
+                    } else {
+                        resetCharts();
+                    }
+                }
+            }
+
+            navTabs.addEventListener('click', (e) => {
+                if (e.target.matches('.tab-button')) { showTab(e.target.dataset.tab); }
+            });
+            
+            showTab('basics');
+            
+            // --- Cycle Builder ---
+            const qInSlider = document.getElementById('q_in');
+            const qOutSlider = document.getElementById('q_out');
+            const qInVal = document.getElementById('q_in_val');
+            const qOutVal = document.getElementById('q_out_val');
+            const workVal = document.getElementById('work_val');
+            const efficiencyVal = document.getElementById('efficiency_val');
+
+            function calculateEfficiency() {
+                const q_in = parseFloat(qInSlider.value);
+                let q_out = parseFloat(qOutSlider.value);
+                if (q_out >= q_in) {
+                    q_out = q_in - 1;
+                    qOutSlider.value = q_out;
+                }
+                qOutSlider.max = q_in -1;
+                const work = q_in - q_out;
+                const efficiency = (work / q_in) * 100;
+                qInVal.textContent = q_in.toFixed(0);
+                qOutVal.textContent = q_out.toFixed(0);
+                workVal.textContent = work.toFixed(0);
+                efficiencyVal.textContent = efficiency.toFixed(1);
+            }
+
+            qInSlider.addEventListener('input', calculateEfficiency);
+            qOutSlider.addEventListener('input', calculateEfficiency);
+            calculateEfficiency();
+
+            const processList = document.getElementById('process-list');
+            const addStepBtn = document.getElementById('add-step-btn');
+            const startSimBtn = document.getElementById('start-sim-btn');
+            const resetSimBtn = document.getElementById('reset-sim-btn');
+            const simResultNotification = document.getElementById('sim-result-notification');
+            const initialVInput = document.getElementById('initial-v');
+            const initialPInput = document.getElementById('initial-p');
+            const initialTInput = document.getElementById('initial-t');
+            const diagramContainer = document.getElementById('diagram-container');
+            let diagramPlaceholder = document.getElementById('diagram-placeholder');
+
+            const R = 8.31;
+            const Cv = 1.5 * R;
+            const Cp = 2.5 * R;
+            const gamma = Cp / Cv;
+            const n = 1; // Fixed to 1 mol
+            const ATM_TO_PA = 101325;
+
+            let stepCounter = 0;
+
+            const controlOptions = {
+                isobaric: { label: '定圧変化', stateVars: { V: '体積 V [m³]', T: '温度 T [K]' }, flowVars: { Q: '熱量 Q [J]', W: '仕事 W\' [J]'} },
+                isochoric: { label: '定積変化', stateVars: { P: '圧力 P [atm]', T: '温度 T [K]' }, flowVars: { Q: '熱量 Q [J]' } },
+                isothermal: { label: '等温変化', stateVars: { V: '体積 V [m³]', P: '圧力 P [atm]' }, flowVars: { Q: '熱量 Q [J]', W: '仕事 W\' [J]'} },
+                adiabatic: { label: '断熱変化', stateVars: { V: '体積 V [m³]', P: '圧力 P [atm]', T: '温度 T [K]' }, flowVars: { W: '仕事 W\' [J]' } }
+            };
+
+            function addProcessStep() {
+                stepCounter++;
+                const stepId = `step-${stepCounter}`;
+                const stepHtml = `
+                    <div id="${stepId}" class="process-step p-3 rounded-r-lg bg-white shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-md text-gray-700">ステップ ${stepCounter}</h4>
+                            <button class="remove-step-btn text-red-500 hover:text-red-700 font-bold">✕</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-x-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600">プロセス</label>
+                                <select class="process-type p-2 border border-gray-300 rounded-md w-full">
+                                    <option value="isobaric">定圧変化</option>
+                                    <option value="isochoric">定積変化</option>
+                                    <option value="isothermal">等温変化</option>
+                                    <option value="adiabatic">断熱変化</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600">指定方法</label>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <label class="text-sm"><input type="radio" name="control-type-${stepCounter}" value="state" checked class="control-type-radio"> 状態量</label>
+                                    <label class="text-sm flow-radio-label"><input type="radio" name="control-type-${stepCounter}" value="flow" class="control-type-radio"> 熱/仕事</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-2">
+                            <select class="control-var p-2 border border-gray-300 rounded-md"></select>
+                            <div class="flex items-center">
+                                <input type="number" class="control-value p-2 border border-gray-300 rounded-md w-full" value="0" step="0.1">
+                                <div class="value-type-selector ml-2 text-sm space-x-2">
+                                    <label><input type="radio" name="value-type-${stepCounter}" value="absolute" checked class="value-type-radio"> 絶対値</label>
+                                    <label><input type="radio" name="value-type-${stepCounter}" value="multiple" class="value-type-radio"> 倍数</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                processList.insertAdjacentHTML('beforeend', stepHtml);
+                const newStep = document.getElementById(stepId);
+                const processTypeSelect = newStep.querySelector('.process-type');
+                const controlVarSelect = newStep.querySelector('.control-var');
+                const radioButtons = newStep.querySelectorAll('.control-type-radio');
+                const flowRadioLabel = newStep.querySelector('.flow-radio-label');
+                const valueTypeSelector = newStep.querySelector('.value-type-selector');
+
+                function updateControlVars() {
+                    const selectedProcess = processTypeSelect.value;
+                    const selectedType = newStep.querySelector('input[name^="control-type-"]:checked').value;
+                    
+                    const hasFlowVars = Object.keys(controlOptions[selectedProcess].flowVars).length > 0;
+                    flowRadioLabel.style.display = hasFlowVars ? 'inline-block' : 'none';
+                    if (!hasFlowVars && selectedType === 'flow') {
+                        newStep.querySelector('input[value="state"]').checked = true;
+                        updateControlVars();
+                        return;
+                    }
+
+                    valueTypeSelector.style.display = selectedType === 'state' ? 'block' : 'none';
+
+                    const options = selectedType === 'state' ? controlOptions[selectedProcess].stateVars : controlOptions[selectedProcess].flowVars;
+                    controlVarSelect.innerHTML = '';
+                    for (const key in options) {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = options[key];
+                        controlVarSelect.appendChild(option);
+                    }
+                }
+                
+                radioButtons.forEach(radio => radio.addEventListener('change', updateControlVars));
+                processTypeSelect.addEventListener('change', updateControlVars);
+                newStep.querySelector('.remove-step-btn').addEventListener('click', () => newStep.remove());
+                updateControlVars();
+            }
+            
+            addStepBtn.addEventListener('click', addProcessStep);
+
+            function updateInitialState(changedInput) {
+                let p_atm = parseFloat(initialPInput.value);
+                let v = parseFloat(initialVInput.value);
+                let t = parseFloat(initialTInput.value);
+
+                if (isNaN(p_atm) || isNaN(v) || isNaN(t)) return;
+                let p_pa = p_atm * ATM_TO_PA;
+
+                if (changedInput === 'p' || changedInput === 'v') {
+                    const newT = (p_pa * v) / (n * R);
+                    initialTInput.value = newT.toFixed(1);
+                } else if (changedInput === 't') {
+                    const newP_pa = (n * R * t) / v;
+                    initialPInput.value = (newP_pa / ATM_TO_PA).toFixed(2);
+                }
+            }
+            
+            initialPInput.addEventListener('change', () => updateInitialState('p'));
+            initialVInput.addEventListener('change', () => updateInitialState('v'));
+            initialTInput.addEventListener('change', () => updateInitialState('t'));
+
+
+            const pvCtx = document.getElementById('pv-chart').getContext('2d');
+            let pvChart = new Chart(pvCtx, { type: 'scatter', data: { datasets: [] },
+                options: { responsive: true, maintainAspectRatio: false,
+                    scales: { x: { type: 'linear', position: 'bottom', title: { display: true, text: '体積 V [m³]' }, min: 0 }, y: { title: { display: true, text: '圧力 P [atm]' }, min: 0 } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+            const vtCtx = document.getElementById('vt-chart').getContext('2d');
+            let vtChart = new Chart(vtCtx, { type: 'scatter', data: { datasets: [] },
+                options: { responsive: true, maintainAspectRatio: false,
+                    scales: { x: { type: 'linear', position: 'bottom', title: { display: true, text: '体積 V [m³]' }, min: 0 }, y: { title: { display: true, text: '温度 T [K]' }, min: 0 } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            function generatePVPath(startState, endState, process) {
+                const path = [];
+                const steps = 30;
+                const startV = startState.v;
+                const endV = endState.v;
+
+                if (Math.abs(startV - endV) < 1e-9) { // Isochoric
+                    return [ {x: startV, y: startState.p / ATM_TO_PA}, {x: endV, y: endState.p / ATM_TO_PA} ];
+                }
+
+                for (let i = 0; i <= steps; i++) {
+                    const v = startV + (endV - startV) * i / steps;
+                    let p;
+                    if (process === 'isothermal') {
+                        const k = startState.p * startState.v;
+                        p = k / v;
+                    } else if (process === 'adiabatic') {
+                        const k = startState.p * Math.pow(startState.v, gamma);
+                        p = k / Math.pow(v, gamma);
+                    } else { // Isobaric
+                        p = startState.p;
+                    }
+                    path.push({x: v, y: p / ATM_TO_PA});
+                }
+                return path;
+            }
+            
+            function generateVTPath(startState, endState, process) {
+                const path = [];
+                const steps = 30;
+                const startV = startState.v;
+                const endV = endState.v;
+                const startT = startState.t;
+                const endT = endState.t;
+
+                for (let i = 0; i <= steps; i++) {
+                    if (process === 'isochoric') {
+                        const t = startT + (endT - startT) * i / steps;
+                        path.push({x: startV, y: t});
+                    } else {
+                        const v = startV + (endV - startV) * i / steps;
+                        let t;
+                        switch(process) {
+                            case 'isothermal':
+                                t = startT;
+                                break;
+                            case 'adiabatic':
+                                const k_ad = startT * Math.pow(startV, gamma - 1);
+                                t = k_ad / Math.pow(v, gamma - 1);
+                                break;
+                            case 'isobaric': // V/T = const => T = (T_start/V_start) * v
+                                t = (startT / startV) * v;
+                                break;
+                        }
+                        path.push({x: v, y: t});
+                    }
+                }
+                return path;
+            }
+
+
+            function resetCharts(initialState = {v:0.0246, p:101325, t:300}) {
+                lastSimulationPVPath = null;
+                lastSimulationVTPath = null;
+                lastSimulationStates = null;
+                
+                const commonPointStyles = { borderColor: '#dc2626', backgroundColor: '#dc2626', pointRadius: 5, showLine: false };
+                const commonPathStyles = { borderColor: '#0d6efd', backgroundColor: 'transparent', pointRadius: 0, showLine: true, fill: false, tension: 0.1 };
+
+                pvChart.data.datasets = [
+                    { label: '状態点', data: [{x: initialState.v, y: initialState.p / ATM_TO_PA}], ...commonPointStyles },
+                    { label: '状態変化', data: [], ...commonPathStyles }
+                ];
+                pvChart.update();
+
+                vtChart.data.datasets = [
+                    { label: '状態点', data: [{x: initialState.v, y: initialState.t}], ...commonPointStyles },
+                    { label: '状態変化', data: [], ...commonPathStyles }
+                ];
+                vtChart.update();
+            }
+
+            function startSimulation() {
+                startSimBtn.disabled = true;
+                simResultNotification.textContent = '計算中...';
+                
+                let currentState = {
+                    v: parseFloat(initialVInput.value),
+                    p: parseFloat(initialPInput.value) * ATM_TO_PA,
+                    t: parseFloat(initialTInput.value),
+                };
+                currentState.u = 1.5 * n * R * currentState.t;
+
+                const states = [currentState];
+                const transitions = [];
+                const pvPathPoints = [];
+                const vtPathPoints = [];
+                const processSteps = Array.from(document.querySelectorAll('.process-step'));
+
+                for (const step of processSteps) {
+                    const process = step.querySelector('.process-type').value;
+                    const controlType = step.querySelector('input[name^="control-type-"]:checked').value;
+                    const controlVar = step.querySelector('.control-var').value;
+                    let value = parseFloat(step.querySelector('.control-value').value);
+                    const valueType = step.querySelector('input[name^="value-type-"]:checked')?.value;
+
+                    const prevState = states[states.length - 1];
+                    
+                    if (controlType === 'state' && valueType === 'multiple') {
+                        let baseValue = prevState[controlVar.toLowerCase()];
+                        if (controlVar === 'P') baseValue /= ATM_TO_PA;
+                        value = baseValue * value;
+                    }
+                    if (controlType === 'state' && controlVar === 'P') {
+                        value *= ATM_TO_PA;
+                    }
+                    
+                    let nextState = { ...prevState };
+                    
+                    try {
+                        switch (process) {
+                            case 'isobaric':
+                                nextState.p = prevState.p;
+                                if (controlType === 'state') {
+                                    if (controlVar === 'V') nextState.v = value;
+                                    else if (controlVar === 'T') nextState.t = value;
+                                } else { // flow
+                                    if (controlVar === 'Q') nextState.t = prevState.t + value / (n * Cp);
+                                    else if (controlVar === 'W') nextState.v = prevState.v + value / prevState.p;
+                                }
+                                if (controlVar !== 'V' && controlVar !== 'W') nextState.v = prevState.v * (nextState.t / prevState.t);
+                                if (controlVar !== 'T') nextState.t = prevState.t * (nextState.v / prevState.v);
+                                break;
+                            case 'isochoric':
+                                nextState.v = prevState.v;
+                                if (controlType === 'state') {
+                                    if (controlVar === 'P') nextState.p = value;
+                                    else if (controlVar === 'T') nextState.t = value;
+                                } else { // flow
+                                    if (controlVar === 'Q') nextState.t = prevState.t + value / (n * Cv);
+                                }
+                                if (controlVar !== 'P') nextState.p = prevState.p * (nextState.t / prevState.t);
+                                if (controlVar !== 'T') nextState.t = prevState.t * (nextState.p / prevState.p);
+                                break;
+                            case 'isothermal':
+                                nextState.t = prevState.t;
+                                if (controlType === 'state') {
+                                    if (controlVar === 'V') nextState.v = value;
+                                    else if (controlVar === 'P') nextState.p = value;
+                                } else { // flow
+                                    if (controlVar === 'Q' || controlVar === 'W') nextState.v = prevState.v * Math.exp(value / (n * R * prevState.t));
+                                }
+                                if (controlVar !== 'V') nextState.v = (prevState.p * prevState.v) / nextState.p;
+                                if (controlVar !== 'P') nextState.p = (prevState.p * prevState.v) / nextState.v;
+                                break;
+                            case 'adiabatic':
+                                if (controlType === 'state') {
+                                    if (controlVar === 'V') nextState.v = value;
+                                    else if (controlVar === 'P') nextState.p = value;
+                                    else if (controlVar === 'T') nextState.t = value;
+                                } else { // flow (W')
+                                    const deltaU = -value;
+                                    const finalU = prevState.u + deltaU;
+                                    nextState.t = finalU / (1.5 * n * R);
+                                }
+                                
+                                if (controlVar === 'V' || controlType === 'flow') {
+                                     if(controlType === 'flow') nextState.v = prevState.v * Math.pow(prevState.t / nextState.t, 1 / (gamma-1));
+                                     nextState.p = prevState.p * Math.pow(prevState.v / nextState.v, gamma);
+                                } else if (controlVar === 'P') {
+                                    nextState.v = prevState.v * Math.pow(prevState.p / nextState.p, 1 / gamma);
+                                } else if (controlVar === 'T') {
+                                    nextState.v = prevState.v * Math.pow(prevState.t / nextState.t, 1 / (gamma - 1));
+                                }
+                                if (controlType === 'state' && controlVar !== 'T') nextState.t = (nextState.p * nextState.v) / (n * R);
+                                else if (controlType === 'state' && controlVar === 'T') nextState.p = (n * R * nextState.t) / nextState.v;
+                                break;
+                        }
+
+                        nextState.u = 1.5 * n * R * nextState.t;
+                        const deltaU = nextState.u - prevState.u;
+                        let transition = { q: 0, wPrime: 0, process: process };
+                        
+                        if(process === 'adiabatic') {
+                            transition.q = 0;
+                            transition.wPrime = -deltaU;
+                        } else if (process === 'isochoric') {
+                            transition.wPrime = 0;
+                            transition.q = deltaU;
+                        } else if (process === 'isobaric') {
+                            transition.wPrime = prevState.p * (nextState.v - prevState.v);
+                            transition.q = deltaU + transition.wPrime;
+                        } else if (process === 'isothermal') {
+                            transition.wPrime = n * R * prevState.t * Math.log(nextState.v / prevState.v);
+                            transition.q = transition.wPrime;
+                        }
+                        
+                        pvPathPoints.push(...generatePVPath(prevState, nextState, process));
+                        vtPathPoints.push(...generateVTPath(prevState, nextState, process));
+                        states.push(nextState);
+                        transitions.push(transition);
+                    } catch (e) {
+                        simResultNotification.textContent = `ステップ ${states.length} でエラー: ${e.message}`;
+                        startSimBtn.disabled = false;
+                        return;
+                    }
+                }
+                
+                simResultNotification.textContent = '計算中...';
+                lastSimulationStates = states;
+                lastSimulationPVPath = pvPathPoints;
+                lastSimulationVTPath = vtPathPoints;
+                drawStaticCycles(states, pvPathPoints, vtPathPoints);
+                updateTransitionDiagram(states, transitions);
+                simResultNotification.textContent = '「状態遷移」タブで結果を確認できます。';
+                startSimBtn.disabled = false;
+            }
+            
+            function drawStaticCycles(states, pvPath, vtPath) {
+                let maxV = 0, maxP = 0, maxT = 0;
+                states.forEach(state => {
+                    if (state.v > maxV) maxV = state.v;
+                    if (state.p > maxP) maxP = state.p;
+                    if (state.t > maxT) maxT = state.t;
+                });
+                maxV *= 1.2;
+                maxP *= 1.2;
+                maxT *= 1.2;
+                
+                pvChart.data.datasets[0].data = states.map(s => ({x: s.v, y: s.p / ATM_TO_PA}));
+                pvChart.data.datasets[1].data = pvPath;
+                pvChart.options.scales.x.max = maxV;
+                pvChart.options.scales.y.max = maxP / ATM_TO_PA;
+                pvChart.update();
+
+                vtChart.data.datasets[0].data = states.map(s => ({x: s.v, y: s.t}));
+                vtChart.data.datasets[1].data = vtPath;
+                vtChart.options.scales.x.max = maxV;
+                vtChart.options.scales.y.max = maxT;
+                vtChart.update();
+            }
+
+            function updateTransitionDiagram(states, transitions) {
+                diagramContainer.innerHTML = '';
+                if(diagramPlaceholder) diagramPlaceholder.style.display = 'none';
+                let maxP = 0, maxT = 0, maxV = 0;
+                states.forEach(s => {
+                    if (s.p > maxP) maxP = s.p;
+                    if (s.t > maxT) maxT = s.t;
+                    if (s.v > maxV) maxV = s.v;
+                });
+
+                for (let i = 0; i < states.length; i++) {
+                    const state = states[i];
+                    
+                    const tempRatio = Math.min(1, state.t / maxT);
+                    const hue = 240 * (1 - tempRatio); // 240 (blue) to 0 (red)
+                    const gasColor = `hsl(${hue}, 70%, 60%)`;
+
+                    const pressureWeights = Math.ceil((state.p / maxP) * 5);
+                    let weightsHtml = '';
+                    for(let j=0; j<pressureWeights; j++) {
+                        weightsHtml += `<div class="diag-pressure-weight w-1/2 mx-auto"></div>`;
+                    }
+                    
+                    const pistonWidth = (state.v / maxV) * 100;
+
+                    const stateHtml = `
+                        <div class="state-box p-4 rounded-lg w-64 text-center flex-shrink-0">
+                            <h3 class="font-bold text-lg mb-2">状態 ${i}</h3>
+                            <div class="relative diag-piston-cylinder w-full rounded my-2">
+                                <div class="absolute top-0 left-0 h-full flex items-start flex-col-reverse p-1" style="width: ${100 - pistonWidth}%">${weightsHtml}</div>
+                                <div class="diag-gas-area absolute top-0 right-0" style="width: ${pistonWidth}%; background-color: ${gasColor};"></div>
+                                <div class="diag-piston-head absolute top-0 h-full w-2" style="right: ${pistonWidth}%;"></div>
+                            </div>
+                            <div class="text-left text-sm mt-2 grid grid-cols-2 gap-x-4">
+                                <span>P [atm]: <span class="font-mono float-right">${(state.p/ATM_TO_PA).toFixed(2)}</span></span>
+                                <span>V [m³]: <span class="font-mono float-right">${state.v.toFixed(2)}</span></span>
+                                <span>T [K]: <span class="font-mono float-right">${state.t.toFixed(2)}</span></span>
+                                <span>U [J]: <span class="font-mono float-right">${state.u.toFixed(2)}</span></span>
+                            </div>
+                        </div>
+                    `;
+                    diagramContainer.insertAdjacentHTML('beforeend', stateHtml);
+
+                    if (i < transitions.length) {
+                        const transition = transitions[i];
+                        const processLabel = controlOptions[transition.process].label;
+                        
+                        let qHtml = '';
+                        if (Math.abs(transition.q) > 1e-9) {
+                            const qIcon = transition.q >= 0 ? '🔥' : '❄️';
+                            qHtml = `<div class="flex items-center text-sm">
+                                        <span class="text-xl w-6 text-center">${qIcon}</span>
+                                        <p class="mx-1">Q=<span class="font-mono">${transition.q.toFixed(2)}</span></p>
+                                    </div>`;
+                        }
+
+                        let wHtml = '';
+                        if (Math.abs(transition.wPrime) > 1e-9) {
+                            const wIcon = transition.wPrime >= 0 ? '💪' : '📥';
+                            wHtml = `<div class="flex items-center text-sm">
+                                        <span class="text-xl w-6 text-center">${wIcon}</span>
+                                        <p class="mx-1">W'=<span class="font-mono">${transition.wPrime.toFixed(2)}</span></p>
+                                    </div>`;
+                        }
+
+                        const transitionHtml = `
+                            <div class="relative w-24 h-auto flex flex-col justify-center items-center self-center flex-shrink-0 px-2">
+                                <div class="text-xs text-gray-600 font-bold">${processLabel}</div>
+                                ${qHtml || '<div class="h-7"></div>'}
+                                <div class="w-16 h-0.5 bg-gray-500 relative my-2">
+                                    <div class="absolute top-1/2 right-[-2px] -translate-y-1/2 w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-l-[8px] border-l-gray-500"></div>
+                                </div>
+                                ${wHtml || '<div class="h-7"></div>'}
+                            </div>
+                        `;
+                        diagramContainer.insertAdjacentHTML('beforeend', transitionHtml);
+                    }
+                }
+            }
+            
+            function resetAll() {
+                lastSimulationPVPath = null;
+                lastSimulationVTPath = null;
+                lastSimulationStates = null;
+                initialPInput.value = "1";
+                initialTInput.value = "300";
+                updateInitialState('t'); 
+
+                processList.innerHTML = '';
+                stepCounter = 0;
+                addProcessStep();
+
+                resetCharts({v: parseFloat(initialVInput.value), p: parseFloat(initialPInput.value) * ATM_TO_PA, t: parseFloat(initialTInput.value)});
+                simResultNotification.textContent = '';
+                diagramContainer.innerHTML = `<p id="diagram-placeholder" class="text-center text-gray-500">シミュレーターでサイクルを開始すると、ここに結果が表示されます。</p>`;
+                diagramPlaceholder = document.getElementById('diagram-placeholder');
+            }
+            
+            startSimBtn.addEventListener('click', startSimulation);
+            resetSimBtn.addEventListener('click', resetAll);
+            addProcessStep();
+            updateInitialState('t');
+            resetCharts({v: parseFloat(initialVInput.value), p: parseFloat(initialPInput.value) * ATM_TO_PA, t: parseFloat(initialTInput.value)});
+        });
+    </script>
+</body>
+</html>
