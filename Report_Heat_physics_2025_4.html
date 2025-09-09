@@ -85,7 +85,8 @@
                         <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
                              <label for="load-json-input" class="font-semibold text-yellow-800">作業の再開:</label>
                              <p class="text-sm text-yellow-700 mb-2">保存したレポートファイル(JSON)を読み込んで、編集を再開できます。</p>
-                             <input type="file" id="load-json-input" accept=".json" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-yellow-100 file:text-yellow-700 hover:file:bg-yellow-200">
+                             <p class="text-sm text-red-600 font-bold mt-2">(注意) 再開した場合は、スクリーンショットのプレビューが表示されていても、ファイル自体は選択されていません。PDFに画像を含めるには、お手数ですが再度スクリーンショットを選択し直してください。</p>
+                             <input type="file" id="load-json-input" accept=".json" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-yellow-100 file:text-yellow-700 hover:file:bg-yellow-200 mt-2">
                         </div>
                     </div>
 
@@ -303,7 +304,7 @@
                     <div class="text-center mt-8 pt-8 border-t-2">
                         <div class="bg-green-100 border-l-4 border-green-500 text-green-800 p-4 mb-6 rounded-md text-left" role="alert">
                             <p class="font-bold">📝 ファイルの提出について</p>
-                            <p>下のボタンを両方クリックし、作成された<strong>PDFファイル</strong>と<strong>JSONファイル</strong>の２つをGoogle Classroomの課題に添付して提出してください。(注意)再開した場合は、スクリーショットが表示されていても、ファイルが選択されていないためpdfを書き出してもスクリーショットがない状態になります。再度、ファイル選択から再びスクリーショットを選択するのを忘れないでください。</p>
+                            <p>下のボタンを両方クリックし、作成された<strong>PDFファイル</strong>と<strong>JSONファイル</strong>の２つをGoogle Classroomの課題に添付して提出してください。</p>
                         </div>
                         <button type="button" id="generate-report-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors">レポートファイル(JSON)を生成</button>
                         <button type="button" id="export-pdf-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors">PDFへ書き出し</button>
@@ -502,11 +503,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function generateReportData() {
         const toBase64 = file => new Promise((resolve) => {
-            if (!file) { resolve(null); return; }
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = () => resolve(null);
+            // If the file input has a file, read it. Otherwise, check if the preview has a base64 src.
+            if (file) {
+                 const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => resolve(null);
+            } else {
+                 resolve(null);
+            }
         });
         
         return {
@@ -515,10 +520,10 @@ document.addEventListener('DOMContentLoaded', () => {
             submissionDate: new Date().toISOString(),
             answers: getStudentAnswers(),
             grading: gradeAnswers(getStudentAnswers()),
-            q1: { method: getMethodSteps('q1-method-steps'), screenshot: await toBase64(document.getElementById('q1-screenshot').files[0]), findings: document.getElementById('q1-findings').value, understanding: document.getElementById('q1-understanding').value },
-            q2: { method: getMethodSteps('q2-method-steps'), results: document.getElementById('q2-results').value, screenshot: await toBase64(document.getElementById('q2-screenshot').files[0]), findings: document.getElementById('q2-findings').value, understanding: document.getElementById('q2-understanding').value },
-            q3: { method: getMethodSteps('q3-method-steps'), screenshot: await toBase64(document.getElementById('q3-screenshot').files[0]), findings: document.getElementById('q3-findings').value, understanding: document.getElementById('q3-understanding').value },
-            q4: { method: getMethodSteps('q4-method-steps'), results: document.getElementById('q4-results').value, findings: document.getElementById('q4-findings').value, understanding: document.getElementById('q4-understanding').value }
+            q1: { method: getMethodSteps('q1-method-steps'), screenshot: document.getElementById('q1-preview').src.startsWith('data:image') ? document.getElementById('q1-preview').src : await toBase64(document.getElementById('q1-screenshot').files[0]), findings: document.getElementById('q1-findings').value, understanding: document.getElementById('q1-understanding').value },
+            q2: { method: getMethodSteps('q2-method-steps'), results: document.getElementById('q2-results').value, screenshot: document.getElementById('q2-preview').src.startsWith('data:image') ? document.getElementById('q2-preview').src : await toBase64(document.getElementById('q2-screenshot').files[0]), findings: document.getElementById('q2-findings').value, understanding: document.getElementById('q2-understanding').value },
+            q3: { method: getMethodSteps('q3-method-steps'), screenshot: document.getElementById('q3-preview').src.startsWith('data:image') ? document.getElementById('q3-preview').src : await toBase64(document.getElementById('q3-screenshot').files[0]), findings: document.getElementById('q3-findings').value, understanding: document.getElementById('q3-understanding').value },
+            q4: { method: getMethodSteps('q4-method-steps'), results: document.getElementById('q4-results').value, screenshot: document.getElementById('q4-preview').src.startsWith('data:image') ? document.getElementById('q4-preview').src : await toBase64(document.getElementById('q4-screenshot').files[0]), findings: document.getElementById('q4-findings').value, understanding: document.getElementById('q4-understanding').value }
         };
     }
     
@@ -556,8 +561,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             exportPdfBtn.disabled = true;
             exportPdfBtn.textContent = 'PDF生成中...';
-
-            const data = await generateReportData();
+            
+            // For PDF generation, we must use fresh data including potentially re-selected images
+            const dataForPdf = {
+                ...await generateReportData(),
+                 q1: { ... (await generateReportData()).q1, screenshot: await (new Promise(resolve => { const file = document.getElementById('q1-screenshot').files[0]; if (!file) { resolve(document.getElementById('q1-preview').src.startsWith('data:image') ? document.getElementById('q1-preview').src : null); return; } const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = () => resolve(null); })) },
+                 q2: { ... (await generateReportData()).q2, screenshot: await (new Promise(resolve => { const file = document.getElementById('q2-screenshot').files[0]; if (!file) { resolve(document.getElementById('q2-preview').src.startsWith('data:image') ? document.getElementById('q2-preview').src : null); return; } const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = () => resolve(null); })) },
+                 q3: { ... (await generateReportData()).q3, screenshot: await (new Promise(resolve => { const file = document.getElementById('q3-screenshot').files[0]; if (!file) { resolve(document.getElementById('q3-preview').src.startsWith('data:image') ? document.getElementById('q3-preview').src : null); return; } const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = () => resolve(null); })) },
+                 q4: { ... (await generateReportData()).q4, screenshot: await (new Promise(resolve => { const file = document.getElementById('q4-screenshot').files[0]; if (!file) { resolve(document.getElementById('q4-preview').src.startsWith('data:image') ? document.getElementById('q4-preview').src : null); return; } const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = () => resolve(null); })) },
+            };
             
             const getSelectedText = (selectId) => {
                  const select = document.getElementById(selectId);
@@ -570,54 +582,54 @@ document.addEventListener('DOMContentLoaded', () => {
             const reportHtml = `
                 <div id="pdf-render-area" style="width: 210mm; background: white; color: black; padding: 20mm;">
                     <h1>高校物理 熱力学レポート</h1>
-                    <p><strong>出席番号:</strong> ${escapeHtml(data.studentId)}</p>
-                    <p><strong>氏名:</strong> ${escapeHtml(data.studentName)}</p>
-                    <p><strong>提出日時:</strong> ${new Date(data.submissionDate).toLocaleString('ja-JP')}</p>
-                    <p><strong>正答率:</strong> ${data.grading.totalScore} / ${data.grading.totalQuestions} (${(data.grading.totalScore/data.grading.totalQuestions*100).toFixed(1)}%)</p>
+                    <p><strong>出席番号:</strong> ${escapeHtml(dataForPdf.studentId)}</p>
+                    <p><strong>氏名:</strong> ${escapeHtml(dataForPdf.studentName)}</p>
+                    <p><strong>提出日時:</strong> ${new Date(dataForPdf.submissionDate).toLocaleString('ja-JP')}</p>
+                    <p><strong>正答率:</strong> ${dataForPdf.grading.totalScore} / ${dataForPdf.grading.totalQuestions} (${(dataForPdf.grading.totalScore/dataForPdf.grading.totalQuestions*100).toFixed(1)}%)</p>
 
                     <h2>課題1：複数の状態変化の比較</h2>
                     <h3>解答</h3>
-                    <p>問1: ${getSelectedText('q78_1')} (${data.grading.q1.details.q78_1 ? "正解" : "不正解"})</p>
-                    <p>問2: ${getSelectedText('q78_2')} (${data.grading.q1.details.q78_2 ? "正解" : "不正解"})</p>
-                    <p>問3: ${getSelectedText('q78_3')} (${data.grading.q1.details.q78_3 ? "正解" : "不正解"})</p>
+                    <p>問1: ${getSelectedText('q78_1')} (${dataForPdf.grading.q1.details.q78_1 ? "正解" : "不正解"})</p>
+                    <p>問2: ${getSelectedText('q78_2')} (${dataForPdf.grading.q1.details.q78_2 ? "正解" : "不正解"})</p>
+                    <p>問3: ${getSelectedText('q78_3')} (${dataForPdf.grading.q1.details.q78_3 ? "正解" : "不正解"})</p>
                     <h3>シミュレーションと考察</h3>
-                    <p><strong>理解度:</strong> ${u_text(data.q1.understanding)}</p>
-                    <p><strong>方法:</strong></p><pre>${formatMethod(data.q1.method)}</pre>
-                    <p><strong>スクリーンショット:</strong></p>${data.q1.screenshot ? `<img src="${data.q1.screenshot}">` : '<p>なし</p>'}
-                    <p><strong>考察:</strong></p><pre>${escapeHtml(data.q1.findings) || '（未記入）'}</pre>
+                    <p><strong>理解度:</strong> ${u_text(dataForPdf.q1.understanding)}</p>
+                    <p><strong>方法:</strong></p><pre>${formatMethod(dataForPdf.q1.method)}</pre>
+                    <p><strong>スクリーンショット:</strong></p>${dataForPdf.q1.screenshot ? `<img src="${dataForPdf.q1.screenshot}">` : '<p>なし</p>'}
+                    <p><strong>考察:</strong></p><pre>${escapeHtml(dataForPdf.q1.findings) || '（未記入）'}</pre>
 
                     <h2>課題2：熱機関のサイクル</h2>
                     <h3>解答</h3>
-                    <p>問1: ${getSelectedText('q79_1')} (${data.grading.q2.details.q79_1 ? "正解" : "不正解"})</p>
-                    <p>問2: ${getSelectedText('q79_2')} (${data.grading.q2.details.q79_2 ? "正解" : "不正解"})</p>
-                    <p>問3(1): ${getSelectedText('q79_3_1')} (${data.grading.q2.details.q79_3_1 ? "正解" : "不正解"})</p>
-                    <p>問3(2): ${getSelectedText('q79_3_2')} (${data.grading.q2.details.q79_3_2 ? "正解" : "不正解"})</p>
-                    <p>問3(3) 仕事W: ${getSelectedText('q79_3_3_W')} (${data.grading.q2.details.q79_3_3_W ? "正解" : "不正解"})</p>
-                    <p>問3(3) 熱量Q: ${getSelectedText('q79_3_3_Q')} (${data.grading.q2.details.q79_3_3_Q ? "正解" : "不正解"})</p>
+                    <p>問1: ${getSelectedText('q79_1')} (${dataForPdf.grading.q2.details.q79_1 ? "正解" : "不正解"})</p>
+                    <p>問2: ${getSelectedText('q79_2')} (${dataForPdf.grading.q2.details.q79_2 ? "正解" : "不正解"})</p>
+                    <p>問3(1): ${getSelectedText('q79_3_1')} (${dataForPdf.grading.q2.details.q79_3_1 ? "正解" : "不正解"})</p>
+                    <p>問3(2): ${getSelectedText('q79_3_2')} (${dataForPdf.grading.q2.details.q79_3_2 ? "正解" : "不正解"})</p>
+                    <p>問3(3) 仕事W: ${getSelectedText('q79_3_3_W')} (${dataForPdf.grading.q2.details.q79_3_3_W ? "正解" : "不正解"})</p>
+                    <p>問3(3) 熱量Q: ${getSelectedText('q79_3_3_Q')} (${dataForPdf.grading.q2.details.q79_3_3_Q ? "正解" : "不正解"})</p>
                     <h3>シミュレーションと考察</h3>
-                    <p><strong>理解度:</strong> ${u_text(data.q2.understanding)}</p>
-                    <p><strong>方法:</strong></p><pre>${formatMethod(data.q2.method)}</pre>
-                    <p><strong>結果:</strong></p><pre>${escapeHtml(data.q2.results) || '（未記入）'}</pre>
-                    <p><strong>スクリーンショット:</strong></p>${data.q2.screenshot ? `<img src="${data.q2.screenshot}">` : '<p>なし</p>'}
-                    <p><strong>考察:</strong></p><pre>${escapeHtml(data.q2.findings) || '（未記入）'}</pre>
+                    <p><strong>理解度:</strong> ${u_text(dataForPdf.q2.understanding)}</p>
+                    <p><strong>方法:</strong></p><pre>${formatMethod(dataForPdf.q2.method)}</pre>
+                    <p><strong>結果:</strong></p><pre>${escapeHtml(dataForPdf.q2.results) || '（未記入）'}</pre>
+                    <p><strong>スクリーンショット:</strong></p>${dataForPdf.q2.screenshot ? `<img src="${dataForPdf.q2.screenshot}">` : '<p>なし</p>'}
+                    <p><strong>考察:</strong></p><pre>${escapeHtml(dataForPdf.q2.findings) || '（未記入）'}</pre>
 
                     <h2>課題3：断熱変化と等温変化の性質の比較</h2>
                     <h3>解答</h3>
-                    <p>問1: ${getSelectedText('q83_1')} (${data.grading.q3.details.q83_1 ? "正解" : "不正解"})</p>
+                    <p>問1: ${getSelectedText('q83_1')} (${dataForPdf.grading.q3.details.q83_1 ? "正解" : "不正解"})</p>
                     <h3>シミュレーションと考察</h3>
-                    <p><strong>理解度:</strong> ${u_text(data.q3.understanding)}</p>
-                    <p><strong>方法:</strong></p><pre>${formatMethod(data.q3.method)}</pre>
-                    <p><strong>スクリーンショット:</strong></p>${data.q3.screenshot ? `<img src="${data.q3.screenshot}">` : '<p>なし</p>'}
-                    <p><strong>考察:</strong></p><pre>${escapeHtml(data.q3.findings) || '（未記入）'}</pre>
+                    <p><strong>理解度:</strong> ${u_text(dataForPdf.q3.understanding)}</p>
+                    <p><strong>方法:</strong></p><pre>${formatMethod(dataForPdf.q3.method)}</pre>
+                    <p><strong>スクリーンショット:</strong></p>${dataForPdf.q3.screenshot ? `<img src="${dataForPdf.q3.screenshot}">` : '<p>なし</p>'}
+                    <p><strong>考察:</strong></p><pre>${escapeHtml(dataForPdf.q3.findings) || '（未記入）'}</pre>
                     
                     <h2>課題4：断熱圧縮における物理量の変化</h2>
                     <h3>解答</h3>
-                    <p>問1: ${getSelectedText('q73_1')} (${data.grading.q4.details.q73_1 ? "正解" : "不正解"})</p>
+                    <p>問1: ${getSelectedText('q73_1')} (${dataForPdf.grading.q4.details.q73_1 ? "正解" : "不正解"})</p>
                     <h3>シミュレーションと考察</h3>
-                    <p><strong>理解度:</strong> ${u_text(data.q4.understanding)}</p>
-                    <p><strong>方法:</strong></p><pre>${formatMethod(data.q4.method)}</pre>
-                    <p><strong>結果:</strong></p><pre>${escapeHtml(data.q4.results) || '（未記入）'}</pre>
-                    <p><strong>考察:</strong></p><pre>${escapeHtml(data.q4.findings) || '（未記入）'}</pre>
+                    <p><strong>理解度:</strong> ${u_text(dataForPdf.q4.understanding)}</p>
+                    <p><strong>方法:</strong></p><pre>${formatMethod(dataForPdf.q4.method)}</pre>
+                    <p><strong>結果:</strong></p><pre>${escapeHtml(dataForPdf.q4.results) || '（未記入）'}</pre>
+                    <p><strong>考察:</strong></p><pre>${escapeHtml(dataForPdf.q4.findings) || '（未記入）'}</pre>
                 </div>
             `;
 
@@ -666,7 +678,7 @@ document.addEventListener('DOMContentLoaded', () => {
                       heightLeft -= pdf.internal.pageSize.getHeight();
                     }
 
-                    pdf.save(`thermo_report_${data.studentId}_${data.studentName.replace(/\s/g, '_')}.pdf`);
+                    pdf.save(`thermo_report_${dataForPdf.studentId}_${dataForPdf.studentName.replace(/\s/g, '_')}.pdf`);
                 });
             } catch (error) {
                 console.error("PDF生成に失敗しました:", error);
@@ -779,14 +791,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateProgressChart(data) {
         const progress = { q1: 0, q2: 0, q3: 0, q4: 0 };
         data.forEach(r => {
-            if (r.q1?.findings.trim()) progress.q1++;
-            if (r.q2?.findings.trim()) progress.q2++;
-            if (r.q3?.findings.trim()) progress.q3++;
-            if (r.q4?.findings.trim()) progress.q4++;
+            if (r.q1?.findings?.trim()) progress.q1++;
+            if (r.q2?.findings?.trim()) progress.q2++;
+            if (r.q3?.findings?.trim()) progress.q3++;
+            if (r.q4?.findings?.trim()) progress.q4++;
         });
         const ctx = document.getElementById('progress-chart').getContext('2d');
         if (progressChartInstance) progressChartInstance.destroy();
-        progressChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['課題1', '課題2', '課題3', '課題4'], datasets: [{ label: '記入率', data: Object.values(progress).map(p => p / data.length * 100), backgroundColor: 'rgba(59, 130, 246, 0.5)' }] }, options: { scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + "%" } } }, plugins: { title: { display: true, text: `考察 記入率 (全${data.length}名)` } } } });
+        progressChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['課題1', '課題2', '課題3', '課題4'], datasets: [{ label: '記入率', data: Object.values(progress).map(p => data.length > 0 ? p / data.length * 100 : 0), backgroundColor: 'rgba(59, 130, 246, 0.5)' }] }, options: { scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + "%" } } }, plugins: { title: { display: true, text: `考察 記入率 (全${data.length}名)` } } } });
     }
 
     function updateScoreChart(data) {
@@ -794,7 +806,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const totals = { q1: 0, q2: 0, q3: 0, q4: 0 };
         data.forEach(r => {
             if(r.grading) {
-                ['q1','q2','q3','q4'].forEach(q => { scores[q] += r.grading[q].correct; totals[q] += r.grading[q].total; });
+                ['q1','q2','q3','q4'].forEach(q => { 
+                    if (r.grading[q]) {
+                        scores[q] += r.grading[q].correct; 
+                        totals[q] += r.grading[q].total; 
+                    }
+                });
             }
         });
         const avgScores = ['q1','q2','q3','q4'].map(q => totals[q] > 0 ? (scores[q] / totals[q] * 100) : 0);
@@ -809,13 +826,13 @@ document.addEventListener('DOMContentLoaded', () => {
         data.sort((a,b) => (a.studentId || "").localeCompare(b.studentId || ""));
         data.forEach(report => {
             const row = document.createElement('tr');
-            const progressCount = [report.q1, report.q2, report.q3, report.q4].reduce((acc, q) => acc + (q && (q.method.length>0 || q.method?.trim()) && q.findings.trim() ? 1 : 0), 0);
+            const progressCount = [report.q1, report.q2, report.q3, report.q4].reduce((acc, q) => acc + (q && ( (q.method && q.method.length>0) || q.results?.trim()) && q.findings?.trim() ? 1 : 0), 0);
             const progressHtml = `<div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-blue-600 h-2.5 rounded-full" style="width: ${progressCount/4*100}%"></div></div>`;
             const u_map = r => [r.q1, r.q2, r.q3, r.q4].map(q => q ? q.understanding : '-').join('/');
             
             row.innerHTML = `
-                <td class="p-3 border-b">${report.studentId}</td>
-                <td class="p-3 border-b">${report.studentName}</td>
+                <td class="p-3 border-b">${report.studentId || '(未設定)'}</td>
+                <td class="p-3 border-b">${report.studentName || '(未設定)'}</td>
                 <td class="p-3 border-b text-center">${u_map(report)}</td>
                 <td class="p-3 border-b text-center">${progressHtml}</td>
                 <td class="p-3 border-b text-center"><button class="view-report-btn text-blue-500 underline" data-filename="${report.fileName}">表示</button></td>
@@ -836,13 +853,23 @@ document.addEventListener('DOMContentLoaded', () => {
         csvContent += headers.join(",") + "\r\n";
         
         allReportData.sort((a,b) => (a.studentId || "").localeCompare(b.studentId || "")).forEach(r => {
-            const progressCount = [r.q1, r.q2, r.q3, r.q4].reduce((acc, q) => acc + (q && (q.method.length>0 || q.method?.trim()) && q.findings.trim() ? 1 : 0), 0);
+            const progressCount = [r.q1, r.q2, r.q3, r.q4].reduce((acc, q) => acc + (q && ( (q.method && q.method.length>0) || q.results?.trim()) && q.findings?.trim() ? 1 : 0), 0);
             const progressPercent = (progressCount / 4 * 100).toFixed(1);
-            const scorePercent = (r.grading.totalScore / r.grading.totalQuestions * 100).toFixed(1);
+
+            const grading = r.grading || { totalScore: 0, totalQuestions: 0 };
+            const scorePercent = grading.totalQuestions > 0 ? (grading.totalScore / grading.totalQuestions * 100).toFixed(1) : "0.0";
+            
             const row = [
-                `"${r.studentId}"`, `"${r.studentName}"`, `"${new Date(r.submissionDate).toLocaleString('ja-JP')}"`,
-                r.grading.totalScore, r.grading.totalQuestions, scorePercent,
-                r.q1.understanding, r.q2.understanding, r.q3.understanding, r.q4.understanding,
+                `"${r.studentId || ''}"`,
+                `"${r.studentName || ''}"`,
+                `"${r.submissionDate ? new Date(r.submissionDate).toLocaleString('ja-JP') : ''}"`,
+                grading.totalScore,
+                grading.totalQuestions,
+                scorePercent,
+                r.q1 ? r.q1.understanding : '-',
+                r.q2 ? r.q2.understanding : '-',
+                r.q3 ? r.q3.understanding : '-',
+                r.q4 ? r.q4.understanding : '-',
                 progressPercent
             ];
             csvContent += row.join(",") + "\r\n";
