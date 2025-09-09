@@ -49,6 +49,7 @@
             <button data-tab="simulator" class="tab-button font-semibold py-3 px-4 md:px-6 border-b-4 border-transparent hover:border-blue-500 hover:bg-blue-50 focus:outline-none">サイクルビルダー</button>
             <button data-tab="transition-diagram" class="tab-button font-semibold py-3 px-4 md:px-6 border-b-4 border-transparent hover:border-blue-500 hover:bg-blue-50 focus:outline-none">状態遷移</button>
             <button data-tab="engine" class="tab-button font-semibold py-3 px-4 md:px-6 border-b-4 border-transparent hover:border-blue-500 hover:bg-blue-50 focus:outline-none">熱機関</button>
+            <button data-tab="appendix" class="tab-button font-semibold py-3 px-4 md:px-6 border-b-4 border-transparent hover:border-blue-500 hover:bg-blue-50 focus:outline-none">付録</button>
         </nav>
 
         <main>
@@ -359,6 +360,10 @@
                         <h3 class="text-lg font-semibold mb-3">3. シミュレーション実行</h3>
                         <button id="start-sim-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-lg transition-colors text-xl">サイクル開始</button>
                         <button id="reset-sim-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg transition-colors text-xl ml-4">リセット</button>
+                        <div class="mt-4 flex items-center justify-center">
+                            <input type="checkbox" id="keep-history-checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <label for="keep-history-checkbox" class="ml-2 block text-sm text-gray-900">過去2回のシミュレーション結果を保持する</label>
+                        </div>
                         <p id="sim-result-notification" class="text-blue-600 mt-2 h-5"></p>
                     </div>
                 </div>
@@ -576,7 +581,71 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </section>
+            
+            <section id="appendix" class="content-section space-y-8">
+                <!-- NEW APPENDIX CONTENT -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-700">付録：真空と熱・温度の関係</h2>
+                    <p class="mb-6">熱力学を学ぶ上で、しばしば疑問として挙がるのが「真空」の扱いです。物質が存在しない、あるいは極めて希薄な空間で、熱や温度はどのように振る舞うのでしょうか？このセクションでは、そうした疑問に答えます。</p>
 
+                    <div class="space-y-8">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">真空に「温度」はあるのか？</h3>
+                            <p class="mb-4">まず、「温度」とは分子や原子のランダムな運動（熱運動）の激しさを表す指標です。つまり、運動する**粒子**が存在することが前提となります。したがって、粒子が全く存在しない「絶対真空」では、温度を定義することができません。</p>
+                            <p class="mb-4">しかし、現実の宇宙空間は完全な空っぽではありません。ビッグバンの名残である**宇宙マイクロ波背景放射(CMB)**という電磁波で満たされています。この電磁波は、絶対温度約2.7K（-270.45℃）の物体が放つ黒体放射と一致しており、これが「宇宙の温度」と呼ばれています。</p>
+                             <div class="formula p-4 rounded-md mt-4 text-center border-l-purple-500">
+                                <p class="font-bold">宇宙空間の温度 ≈ 2.7 K</p>
+                                <p class="text-sm text-gray-600 mt-1">（宇宙マイクロ波背景放射による）</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">真空中での熱の伝わり方</h3>
+                            <p class="mb-4">熱の伝わり方には、**伝導**、**対流**、**放射**の3つの形態があります。</p>
+                            <ul class="list-disc list-inside space-y-2 mb-4 pl-4">
+                                <li><b>伝導:</b> 物質内で熱が次々と隣の分子に伝わる現象。物質（媒質）が必要です。</li>
+                                <li><b>対流:</b> 液体や気体が循環することで熱が運ばれる現象。これも物質（媒質）が必要です。</li>
+                                <li><b>放射 (輻射):</b> 熱が電磁波として空間を伝わる現象。**媒質を必要としない**唯一の伝熱形態です。</li>
+                            </ul>
+                            <p>このため、粒子がほとんど存在しない真空中では、伝導と対流は起こりません。熱は**放射**によってのみ伝わります。太陽の熱が地球まで届くのは、この放射のおかげです。</p>
+                        </div>
+
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">応用例：魔法瓶の仕組み</h3>
+                            <p class="mb-4">これらの原理を巧みに利用したのが、私たちの身近にある魔法瓶（真空断熱タンブラー）です。</p>
+                            <div class="grid md:grid-cols-2 gap-8 items-center mt-6 bg-gray-50 p-6 rounded-lg">
+                                <div class="w-full max-w-xs mx-auto">
+                                    <div class="relative bg-gray-300 h-64 rounded-t-xl p-3 pt-8">
+                                        <div class="absolute top-2 left-1/2 -translate-x-1/2 bg-gray-500 w-16 h-6 rounded-t-md"></div>
+                                        <div class="relative bg-gray-200 h-full rounded-t-lg p-3 border-2 border-gray-400">
+                                             <div class="bg-white h-full rounded-t-md border-2 border-gray-400 p-2 text-center text-sm font-bold text-gray-700">
+                                                <span class="writing-mode-vertical-rl">内容物 (お湯など)</span>
+                                             </div>
+                                             <div class="absolute top-1/2 -right-10 text-xs text-gray-600">
+                                                <p>銀メッキ</p>
+                                                <p>(放射を反射)</p>
+                                             </div>
+                                        </div>
+                                         <div class="absolute top-1/2 left-2 text-xs text-gray-600">
+                                            <p>真空層</p>
+                                            <p>(伝導・対流を防ぐ)</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-center text-sm font-bold mt-2">魔法瓶の構造</p>
+                                </div>
+                                <div>
+                                    <p class="mb-2">魔法瓶は、内瓶と外瓶の二重構造になっており、その間が真空状態に保たれています。</p>
+                                    <ul class="list-decimal list-inside space-y-3">
+                                        <li><span class="font-bold">真空層の効果:</span> 内瓶と外瓶の間が真空であるため、熱が**伝導**や**対流**によって移動するのを防ぎます。</li>
+                                        <li><span class="font-bold">銀メッキの効果:</span> 内瓶の外側と外瓶の内側が鏡のように銀メッキされています。これにより、熱**放射**（赤外線）を反射し、熱が電磁波として移動するのも大幅に防ぎます。</li>
+                                    </ul>
+                                    <p class="mt-4 font-semibold">結果として、魔法瓶は3つの伝熱形態すべてを遮断し、中身の温度を長時間維持することができるのです。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
@@ -600,9 +669,12 @@
             const navTabs = document.getElementById('nav-tabs');
             let microSimAnimationId = null;
             let engineSimAnimationId = null;
+            
+            // --- MODIFIED: Added history array for cycle builder
             let lastSimulationStates = null;
-            let lastSimulationPVPath = null;
-            let lastSimulationVTPath = null;
+            let lastSimulationPVPathSegments = null;
+            let lastSimulationVTPathSegments = null;
+            let history = []; 
             
             // --- Micro Sim ---
             let microCanvas, microCtx, pressureDisplay, keDisplay, tempDisplay, heatUpBtnGas, coolDownBtnGas, energyBar;
@@ -664,6 +736,7 @@
                 
                 // Gas Sim Elements
                 microCanvas = document.getElementById('molecule-canvas');
+                if (!microCanvas) return; // Exit if canvas not found (e.g., on appendix tab)
                 microCtx = microCanvas.getContext('2d');
                 pressureDisplay = document.getElementById('pressure-display');
                 keDisplay = document.getElementById('ke-display');
@@ -734,6 +807,7 @@
             }
             
             function animateMicro() {
+                if (!microCanvas) return;
                 // Gas Sim
                 microCtx.clearRect(0, 0, microCanvas.width, microCanvas.height);
                 let totalKE = 0;
@@ -1010,6 +1084,7 @@
                 drawCarnotCycle();
 
                 heatPumpCanvas = document.getElementById('heat-pump-canvas');
+                if (!heatPumpCanvas) return;
                 heatPumpCtx = heatPumpCanvas.getContext('2d');
                 workInputSlider = document.getElementById('work-input-slider');
                 coolingModeBtn = document.getElementById('cooling-mode-btn');
@@ -1077,7 +1152,7 @@
             }
 
             function animateEngine() {
-                // Heat Pump Sim
+                if (!heatPumpCanvas) return;
                 const w = heatPumpCanvas.width;
                 const h = heatPumpCanvas.height;
                 heatPumpCtx.clearRect(0, 0, w, h);
@@ -1215,6 +1290,7 @@
                 });
             }
             
+            // --- MODIFIED: showTab updated to handle new drawing logic
             function showTab(tabId) {
                 activeTab = tabId;
                 sections.forEach(section => { section.classList.remove('active'); });
@@ -1225,9 +1301,13 @@
                 startSimulationsForTab(tabId);
 
                 if (tabId === 'simulator' || tabId === 'transition-diagram') {
-                    if (lastSimulationPVPath) {
-                        drawStaticCycles(lastSimulationStates, lastSimulationPVPath, lastSimulationVTPath);
+                    if (lastSimulationStates) {
+                        drawStaticCycles();
                     } else {
+                        // Ensure charts are initialized if they haven't been
+                        if (!pvChart || !vtChart) {
+                           setupCharts();
+                        }
                         resetCharts();
                     }
                 }
@@ -1248,6 +1328,7 @@
             const efficiencyVal = document.getElementById('efficiency_val');
 
             function calculateEfficiency() {
+                if (!qInSlider) return; // Exit if not on the engine tab
                 const q_in = parseFloat(qInSlider.value);
                 let q_out = parseFloat(qOutSlider.value);
                 if (q_out >= q_in) {
@@ -1262,10 +1343,12 @@
                 workVal.textContent = work.toFixed(0);
                 efficiencyVal.textContent = efficiency.toFixed(1);
             }
+            if (qInSlider) {
+                qInSlider.addEventListener('input', calculateEfficiency);
+                qOutSlider.addEventListener('input', calculateEfficiency);
+                calculateEfficiency();
+            }
 
-            qInSlider.addEventListener('input', calculateEfficiency);
-            qOutSlider.addEventListener('input', calculateEfficiency);
-            calculateEfficiency();
 
             const processList = document.getElementById('process-list');
             const addStepBtn = document.getElementById('add-step-btn');
@@ -1295,6 +1378,7 @@
             };
 
             function addProcessStep() {
+                if (!processList) return;
                 stepCounter++;
                 const stepId = `step-${stepCounter}`;
                 const stepHtml = `
@@ -1371,9 +1455,10 @@
                 updateControlVars();
             }
             
-            addStepBtn.addEventListener('click', addProcessStep);
+            if (addStepBtn) addStepBtn.addEventListener('click', addProcessStep);
 
             function updateInitialState(changedInput) {
+                if (!initialPInput) return;
                 let p_atm = parseFloat(initialPInput.value);
                 let v = parseFloat(initialVInput.value);
                 let t = parseFloat(initialTInput.value);
@@ -1390,25 +1475,73 @@
                 }
             }
             
-            initialPInput.addEventListener('change', () => updateInitialState('p'));
-            initialVInput.addEventListener('change', () => updateInitialState('v'));
-            initialTInput.addEventListener('change', () => updateInitialState('t'));
+            if (initialPInput) {
+                initialPInput.addEventListener('change', () => updateInitialState('p'));
+                initialVInput.addEventListener('change', () => updateInitialState('v'));
+                initialTInput.addEventListener('change', () => updateInitialState('t'));
+            }
 
+            let pvChart, vtChart;
 
-            const pvCtx = document.getElementById('pv-chart').getContext('2d');
-            let pvChart = new Chart(pvCtx, { type: 'scatter', data: { datasets: [] },
-                options: { responsive: true, maintainAspectRatio: false,
-                    scales: { x: { type: 'linear', position: 'bottom', title: { display: true, text: '体積 V [m³]' }, min: 0 }, y: { title: { display: true, text: '圧力 P [atm]' }, min: 0 } },
-                    plugins: { legend: { display: false } }
-                }
-            });
-            const vtCtx = document.getElementById('vt-chart').getContext('2d');
-            let vtChart = new Chart(vtCtx, { type: 'scatter', data: { datasets: [] },
-                options: { responsive: true, maintainAspectRatio: false,
-                    scales: { x: { type: 'linear', position: 'bottom', title: { display: true, text: '体積 V [m³]' }, min: 0 }, y: { title: { display: true, text: '温度 T [K]' }, min: 0 } },
-                    plugins: { legend: { display: false } }
-                }
-            });
+            function setupCharts() {
+                const pvCanvas = document.getElementById('pv-chart');
+                const vtCanvas = document.getElementById('vt-chart');
+                if (!pvCanvas || !vtCanvas) return;
+                
+                pvChart = new Chart(pvCanvas.getContext('2d'), { type: 'scatter', data: { datasets: [] },
+                    options: { responsive: true, maintainAspectRatio: false,
+                        scales: { x: { type: 'linear', position: 'bottom', title: { display: true, text: '体積 V [m³]' }, min: 0 }, y: { title: { display: true, text: '圧力 P [atm]' }, min: 0 } },
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: { 
+                                mode: 'nearest',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        const datasetLabel = context.dataset.label || '';
+                                        let label = '';
+                                        if (datasetLabel.includes('状態点')) {
+                                            const stateIndex = context.dataIndex;
+                                            label = `${datasetLabel} #${stateIndex}: `;
+                                        } else {
+                                            label = `${datasetLabel}: `;
+                                        }
+                                        label += `P: ${context.parsed.y.toFixed(2)} atm, V: ${context.parsed.x.toFixed(3)} m³`;
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                vtChart = new Chart(vtCanvas.getContext('2d'), { type: 'scatter', data: { datasets: [] },
+                    options: { responsive: true, maintainAspectRatio: false,
+                        scales: { x: { type: 'linear', position: 'bottom', title: { display: true, text: '体積 V [m³]' }, min: 0 }, y: { title: { display: true, text: '温度 T [K]' }, min: 0 } },
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'nearest',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        const datasetLabel = context.dataset.label || '';
+                                        let label = '';
+                                        if (datasetLabel.includes('状態点')) {
+                                            const stateIndex = context.dataIndex;
+                                            label = `${datasetLabel} #${stateIndex}: `;
+                                        } else {
+                                            label = `${datasetLabel}: `;
+                                        }
+                                        label += `T: ${context.parsed.y.toFixed(1)} K, V: ${context.parsed.x.toFixed(3)} m³`;
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
 
             function generatePVPath(startState, endState, process) {
                 const path = [];
@@ -1470,32 +1603,47 @@
                 return path;
             }
 
-
+            // --- MODIFIED: resetCharts updated for new logic
             function resetCharts(initialState = {v:0.0246, p:101325, t:300}) {
-                lastSimulationPVPath = null;
-                lastSimulationVTPath = null;
-                lastSimulationStates = null;
+                if (!pvChart || !vtChart) return;
                 
                 const commonPointStyles = { borderColor: '#dc2626', backgroundColor: '#dc2626', pointRadius: 5, showLine: false };
-                const commonPathStyles = { borderColor: '#0d6efd', backgroundColor: 'transparent', pointRadius: 0, showLine: true, fill: false, tension: 0.1 };
 
                 pvChart.data.datasets = [
-                    { label: '状態点', data: [{x: initialState.v, y: initialState.p / ATM_TO_PA}], ...commonPointStyles },
-                    { label: '状態変化', data: [], ...commonPathStyles }
+                    { label: '状態点', data: [{x: initialState.v, y: initialState.p / ATM_TO_PA}], ...commonPointStyles }
                 ];
+                pvChart.options.scales.x.max = undefined;
+                pvChart.options.scales.y.max = undefined;
                 pvChart.update();
 
                 vtChart.data.datasets = [
-                    { label: '状態点', data: [{x: initialState.v, y: initialState.t}], ...commonPointStyles },
-                    { label: '状態変化', data: [], ...commonPathStyles }
+                    { label: '状態点', data: [{x: initialState.v, y: initialState.t}], ...commonPointStyles }
                 ];
+                vtChart.options.scales.x.max = undefined;
+                vtChart.options.scales.y.max = undefined;
                 vtChart.update();
             }
 
+            // --- MODIFIED: startSimulation function rewritten
             function startSimulation() {
                 startSimBtn.disabled = true;
                 simResultNotification.textContent = '計算中...';
                 
+                const keepHistory = document.getElementById('keep-history-checkbox').checked;
+
+                if (keepHistory && lastSimulationStates) {
+                    history.unshift({
+                        states: lastSimulationStates,
+                        pvPathSegments: lastSimulationPVPathSegments,
+                        vtPathSegments: lastSimulationVTPathSegments
+                    });
+                    if (history.length > 2) {
+                        history.length = 2; // Keep only the last 2
+                    }
+                } else {
+                    history = []; // Clear history if checkbox is off or it's the first run
+                }
+
                 let currentState = {
                     v: parseFloat(initialVInput.value),
                     p: parseFloat(initialPInput.value) * ATM_TO_PA,
@@ -1505,8 +1653,8 @@
 
                 const states = [currentState];
                 const transitions = [];
-                const pvPathPoints = [];
-                const vtPathPoints = [];
+                const pvPathSegments = [];
+                const vtPathSegments = [];
                 const processSteps = Array.from(document.querySelectorAll('.process-step'));
 
                 for (const step of processSteps) {
@@ -1515,6 +1663,7 @@
                     const controlVar = step.querySelector('.control-var').value;
                     let value = parseFloat(step.querySelector('.control-value').value);
                     const valueType = step.querySelector('input[name^="value-type-"]:checked')?.value;
+                    const processLabel = controlOptions[process].label;
 
                     const prevState = states[states.length - 1];
                     
@@ -1607,8 +1756,8 @@
                             transition.q = transition.wPrime;
                         }
                         
-                        pvPathPoints.push(...generatePVPath(prevState, nextState, process));
-                        vtPathPoints.push(...generateVTPath(prevState, nextState, process));
+                        pvPathSegments.push({ data: generatePVPath(prevState, nextState, process), label: processLabel });
+                        vtPathSegments.push({ data: generateVTPath(prevState, nextState, process), label: processLabel });
                         states.push(nextState);
                         transitions.push(transition);
                     } catch (e) {
@@ -1618,41 +1767,107 @@
                     }
                 }
                 
-                simResultNotification.textContent = '計算中...';
+                // Store new simulation as the "last" one
                 lastSimulationStates = states;
-                lastSimulationPVPath = pvPathPoints;
-                lastSimulationVTPath = vtPathPoints;
-                drawStaticCycles(states, pvPathPoints, vtPathPoints);
+                lastSimulationPVPathSegments = pvPathSegments;
+                lastSimulationVTPathSegments = vtPathSegments;
+
+                // Redraw charts with new data and history
+                drawStaticCycles();
+                
                 updateTransitionDiagram(states, transitions);
                 simResultNotification.textContent = '「状態遷移」タブで結果を確認できます。';
                 startSimBtn.disabled = false;
             }
             
-            function drawStaticCycles(states, pvPath, vtPath) {
+            // --- MODIFIED: drawStaticCycles function rewritten
+            function drawStaticCycles() {
+                if (!lastSimulationStates) {
+                    resetCharts();
+                    return;
+                }
+
+                const colors = [
+                    { point: '#dc2626', path: '#0d6efd', pointRadius: 5 }, // Current
+                    { point: 'rgba(108, 117, 125, 0.7)', path: 'rgba(108, 117, 125, 0.7)', pointRadius: 4 }, // History 1
+                    { point: 'rgba(108, 117, 125, 0.4)', path: 'rgba(108, 117, 125, 0.4)', pointRadius: 4 }  // History 2
+                ];
+
+                const pvDatasets = [];
+                const vtDatasets = [];
+                let allStates = [...lastSimulationStates];
+
+                // Draw history first
+                history.forEach((sim, index) => {
+                    const colorSet = colors[index + 1];
+                    sim.pvPathSegments.forEach(segment => {
+                        pvDatasets.push({
+                            label: segment.label, data: segment.data, borderColor: colorSet.path,
+                            pointRadius: 0, showLine: true, fill: false, tension: 0.1, borderWidth: 2
+                        });
+                    });
+                    pvDatasets.push({
+                        label: `過去の状態点 ${index + 1}`, data: sim.states.map(s => ({x: s.v, y: s.p / ATM_TO_PA})),
+                        borderColor: colorSet.point, backgroundColor: colorSet.point, pointRadius: colorSet.pointRadius, showLine: false
+                    });
+                    sim.vtPathSegments.forEach(segment => {
+                        vtDatasets.push({
+                            label: segment.label, data: segment.data, borderColor: colorSet.path,
+                            pointRadius: 0, showLine: true, fill: false, tension: 0.1, borderWidth: 2
+                        });
+                    });
+                    vtDatasets.push({
+                        label: `過去の状態点 ${index + 1}`, data: sim.states.map(s => ({x: s.v, y: s.t})),
+                        borderColor: colorSet.point, backgroundColor: colorSet.point, pointRadius: colorSet.pointRadius, showLine: false
+                    });
+                    allStates.push(...sim.states);
+                });
+
+                // Draw current simulation on top
+                lastSimulationPVPathSegments.forEach(segment => {
+                    pvDatasets.push({
+                        label: segment.label, data: segment.data, borderColor: colors[0].path,
+                        pointRadius: 0, showLine: true, fill: false, tension: 0.1, borderWidth: 2.5
+                    });
+                });
+                pvDatasets.push({
+                    label: '現在の状態点', data: lastSimulationStates.map(s => ({x: s.v, y: s.p / ATM_TO_PA})),
+                    borderColor: colors[0].point, backgroundColor: colors[0].point, pointRadius: colors[0].pointRadius, showLine: false
+                });
+                lastSimulationVTPathSegments.forEach(segment => {
+                    vtDatasets.push({
+                        label: segment.label, data: segment.data, borderColor: colors[0].path,
+                        pointRadius: 0, showLine: true, fill: false, tension: 0.1, borderWidth: 2.5
+                    });
+                });
+                vtDatasets.push({
+                    label: '現在の状態点', data: lastSimulationStates.map(s => ({x: s.v, y: s.t})),
+                    borderColor: colors[0].point, backgroundColor: colors[0].point, pointRadius: colors[0].pointRadius, showLine: false
+                });
+
+                // Update charts data
+                pvChart.data.datasets = pvDatasets;
+                vtChart.data.datasets = vtDatasets;
+
+                // Recalculate axes
                 let maxV = 0, maxP = 0, maxT = 0;
-                states.forEach(state => {
+                allStates.forEach(state => {
                     if (state.v > maxV) maxV = state.v;
                     if (state.p > maxP) maxP = state.p;
                     if (state.t > maxT) maxT = state.t;
                 });
-                maxV *= 1.2;
-                maxP *= 1.2;
-                maxT *= 1.2;
                 
-                pvChart.data.datasets[0].data = states.map(s => ({x: s.v, y: s.p / ATM_TO_PA}));
-                pvChart.data.datasets[1].data = pvPath;
-                pvChart.options.scales.x.max = maxV;
-                pvChart.options.scales.y.max = maxP / ATM_TO_PA;
+                pvChart.options.scales.x.max = maxV * 1.2;
+                pvChart.options.scales.y.max = (maxP / ATM_TO_PA) * 1.2;
+                vtChart.options.scales.x.max = maxV * 1.2;
+                vtChart.options.scales.y.max = maxT * 1.2;
+                
                 pvChart.update();
-
-                vtChart.data.datasets[0].data = states.map(s => ({x: s.v, y: s.t}));
-                vtChart.data.datasets[1].data = vtPath;
-                vtChart.options.scales.x.max = maxV;
-                vtChart.options.scales.y.max = maxT;
                 vtChart.update();
             }
 
             function updateTransitionDiagram(states, transitions) {
+                if (!diagramContainer) return;
                 diagramContainer.innerHTML = '';
                 if(diagramPlaceholder) diagramPlaceholder.style.display = 'none';
                 let maxP = 0, maxT = 0, maxV = 0;
@@ -1687,9 +1902,9 @@
                             </div>
                             <div class="text-left text-sm mt-2 grid grid-cols-2 gap-x-4">
                                 <span>P [atm]: <span class="font-mono float-right">${(state.p/ATM_TO_PA).toFixed(2)}</span></span>
-                                <span>V [m³]: <span class="font-mono float-right">${state.v.toFixed(2)}</span></span>
-                                <span>T [K]: <span class="font-mono float-right">${state.t.toFixed(2)}</span></span>
-                                <span>U [J]: <span class="font-mono float-right">${state.u.toFixed(2)}</span></span>
+                                <span>V [m³]: <span class="font-mono float-right">${state.v.toFixed(3)}</span></span>
+                                <span>T [K]: <span class="font-mono float-right">${state.t.toFixed(1)}</span></span>
+                                <span>U [J]: <span class="font-mono float-right">${state.u.toFixed(1)}</span></span>
                             </div>
                         </div>
                     `;
@@ -1704,7 +1919,7 @@
                             const qIcon = transition.q >= 0 ? '🔥' : '❄️';
                             qHtml = `<div class="flex items-center text-sm">
                                         <span class="text-xl w-6 text-center">${qIcon}</span>
-                                        <p class="mx-1">Q=<span class="font-mono">${transition.q.toFixed(2)}</span></p>
+                                        <p class="mx-1">Q=<span class="font-mono">${transition.q.toFixed(1)}</span></p>
                                     </div>`;
                         }
 
@@ -1713,7 +1928,7 @@
                             const wIcon = transition.wPrime >= 0 ? '💪' : '📥';
                             wHtml = `<div class="flex items-center text-sm">
                                         <span class="text-xl w-6 text-center">${wIcon}</span>
-                                        <p class="mx-1">W'=<span class="font-mono">${transition.wPrime.toFixed(2)}</span></p>
+                                        <p class="mx-1">W'=<span class="font-mono">${transition.wPrime.toFixed(1)}</span></p>
                                     </div>`;
                         }
 
@@ -1732,9 +1947,11 @@
                 }
             }
             
+            // --- MODIFIED: resetAll function updated
             function resetAll() {
-                lastSimulationPVPath = null;
-                lastSimulationVTPath = null;
+                history = [];
+                lastSimulationPVPathSegments = null;
+                lastSimulationVTPathSegments = null;
                 lastSimulationStates = null;
                 initialPInput.value = "1";
                 initialTInput.value = "300";
@@ -1746,16 +1963,22 @@
 
                 resetCharts({v: parseFloat(initialVInput.value), p: parseFloat(initialPInput.value) * ATM_TO_PA, t: parseFloat(initialTInput.value)});
                 simResultNotification.textContent = '';
-                diagramContainer.innerHTML = `<p id="diagram-placeholder" class="text-center text-gray-500">シミュレーターでサイクルを開始すると、ここに結果が表示されます。</p>`;
-                diagramPlaceholder = document.getElementById('diagram-placeholder');
+                if(diagramContainer) {
+                  diagramContainer.innerHTML = `<p id="diagram-placeholder" class="text-center text-gray-500">シミュレーターでサイクルを開始すると、ここに結果が表示されます。</p>`;
+                  diagramPlaceholder = document.getElementById('diagram-placeholder');
+                }
             }
             
-            startSimBtn.addEventListener('click', startSimulation);
-            resetSimBtn.addEventListener('click', resetAll);
-            addProcessStep();
-            updateInitialState('t');
-            resetCharts({v: parseFloat(initialVInput.value), p: parseFloat(initialPInput.value) * ATM_TO_PA, t: parseFloat(initialTInput.value)});
+            if (startSimBtn) {
+              startSimBtn.addEventListener('click', startSimulation);
+              resetSimBtn.addEventListener('click', resetAll);
+              setupCharts();
+              addProcessStep();
+              updateInitialState('t');
+              resetCharts({v: parseFloat(initialVInput.value), p: parseFloat(initialPInput.value) * ATM_TO_PA, t: parseFloat(initialTInput.value)});
+            }
         });
     </script>
 </body>
 </html>
+
