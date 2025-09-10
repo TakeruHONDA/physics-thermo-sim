@@ -501,26 +501,44 @@ document.addEventListener('DOMContentLoaded', () => {
         return results;
     }
 
-    async function generateReportData() {
-        const toBase64 = file => new Promise((resolve) => {
+    async function getFullReportData() {
+        const toBase64 = (file) => new Promise((resolve) => {
             if (!file) { resolve(null); return; }
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => resolve(reader.result);
             reader.onerror = () => resolve(null);
         });
-        
-        return {
+
+        const data = {
             studentId: document.getElementById('student-id').value.trim() || '（番号未入力）',
             studentName: document.getElementById('student-name').value.trim() || '（氏名未入力）',
             submissionDate: new Date().toISOString(),
             answers: getStudentAnswers(),
             grading: gradeAnswers(getStudentAnswers()),
-            q1: { method: getMethodSteps('q1-method-steps'), screenshot: await toBase64(document.getElementById('q1-screenshot').files[0]), findings: document.getElementById('q1-findings').value, understanding: document.getElementById('q1-understanding').value },
-            q2: { method: getMethodSteps('q2-method-steps'), results: document.getElementById('q2-results').value, screenshot: await toBase64(document.getElementById('q2-screenshot').files[0]), findings: document.getElementById('q2-findings').value, understanding: document.getElementById('q2-understanding').value },
-            q3: { method: getMethodSteps('q3-method-steps'), screenshot: await toBase64(document.getElementById('q3-screenshot').files[0]), findings: document.getElementById('q3-findings').value, understanding: document.getElementById('q3-understanding').value },
-            q4: { method: getMethodSteps('q4-method-steps'), results: document.getElementById('q4-results').value, findings: document.getElementById('q4-findings').value, understanding: document.getElementById('q4-understanding').value }
         };
+
+        const questionKeys = ['q1', 'q2', 'q3', 'q4'];
+        for (const qKey of questionKeys) {
+            const fileInput = document.getElementById(`${qKey}-screenshot`);
+            const preview = document.getElementById(`${qKey}-preview`);
+            let screenshotData = null;
+
+            if (fileInput && fileInput.files[0]) {
+                screenshotData = await toBase64(fileInput.files[0]);
+            } else if (preview && preview.src.startsWith('data:image')) {
+                screenshotData = preview.src;
+            }
+
+            data[qKey] = {
+                method: getMethodSteps(`${qKey}-method-steps`),
+                results: document.getElementById(`${qKey}-results`)?.value,
+                findings: document.getElementById(`${qKey}-findings`)?.value,
+                understanding: document.getElementById(`${qKey}-understanding`)?.value,
+                screenshot: screenshotData
+            };
+        }
+        return data;
     }
     
     function validateInputs() {
@@ -535,24 +553,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // JSON書き出しボタンのイベントリスナー
     document.getElementById('generate-report-btn').addEventListener('click', async () => {
-        if (!validateInputs()) {
-            return;
-        }
-        
-        // JSON保存時にはプレビューのBase64も保存対象にする
-        const dataToSave = await generateReportData();
-        ['q1', 'q2', 'q3', 'q4'].forEach(qKey => {
-            const preview = document.getElementById(`${qKey}-preview`);
-            if (preview && preview.src.startsWith('data:image')) {
-                dataToSave[qKey].screenshot = preview.src;
-            }
-        });
-
-        const blob = new Blob([JSON.stringify(dataToSave, null, 2)], { type: 'application/json' });
+        if (!validateInputs()) { return; }
+        const reportData = await getFullReportData();
+        const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `thermo_report_${dataToSave.studentId}_${dataToSave.studentName.replace(/\s/g, '_')}.json`;
+        a.download = `thermo_report_${reportData.studentId}_${reportData.studentName.replace(/\s/g, '_')}.json`;
         a.click();
         URL.revokeObjectURL(url);
         alert('レポートファイル(JSON)が生成されました！');
@@ -560,101 +567,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // PDF書き出しボタンのイベントリスナー
     document.getElementById('export-pdf-btn').addEventListener('click', async () => {
-        if (!validateInputs()) {
-            return;
-        }
+        if (!validateInputs()) { return; }
 
-        exportPdfBtn.disabled = true;
-        exportPdfBtn.textContent = 'PDF生成中...';
+        const btn = document.getElementById('export-pdf-btn');
+        btn.disabled = true;
+        btn.textContent = 'PDF生成中...';
 
-        // PDF生成用のデータを作成（ファイルが選択されていればそれを優先、なければプレビュー画像を使う）
-        const dataForPdf = await generateReportData();
-        const screenshotPromises = ['q1', 'q2', 'q3', 'q4'].map(qKey => {
-            return new Promise(async (resolve) => {
-                const fileInput = document.getElementById(`${qKey}-screenshot`);
-                if (fileInput && fileInput.files[0]) {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(fileInput.files[0]);
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = () => resolve(null);
-                } else {
-                    const preview = document.getElementById(`${qKey}-preview`);
-                    if (preview && preview.src.startsWith('data:image')) {
-                        resolve(preview.src);
-                    } else {
-                        resolve(null);
-                    }
-                }
-            });
-        });
-
-        const screenshots = await Promise.all(screenshotPromises);
-        dataForPdf.q1.screenshot = screenshots[0];
-        dataForPdf.q2.screenshot = screenshots[1];
-        dataForPdf.q3.screenshot = screenshots[2];
-        dataForPdf.q4.screenshot = screenshots[3];
+        const dataForPdf = await getFullReportData();
         
         const getSelectedText = (selectId) => {
              const select = document.getElementById(selectId);
              return select.selectedIndex > 0 ? select.options[select.selectedIndex].text : "未解答";
         };
         const u_text = val => ({'5':'よく理解できた','4':'理解できた','3':'普通','2':'あまり理解できなかった','1':'全く理解できなかった'}[val] || '未評価');
-        const formatMethod = (steps) => steps.map((s, i) => `  Step ${i+1}: ${s.process}, ${s.param}, ${s.type}, 値=${s.value}`).join('\n');
-        const escapeHtml = (text) => text ? text.replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
+        const formatMethod = (steps) => (steps || []).map((s, i) => `  Step ${i+1}: ${s.process}, ${s.param}, ${s.type}, 値=${s.value}`).join('\n');
+        const escapeHtml = (text) => text ? String(text).replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
         
-        const reportHtml = `
-            <div id="pdf-render-area" style="width: 210mm; background: white; color: black; padding: 20mm;">
+        let reportHtml = `
+            <div id="pdf-render-area" style="width: 210mm; background: white; color: black; padding: 20mm; font-size: 10pt;">
                 <h1>高校物理 熱力学レポート</h1>
                 <p><strong>出席番号:</strong> ${escapeHtml(dataForPdf.studentId)}</p>
                 <p><strong>氏名:</strong> ${escapeHtml(dataForPdf.studentName)}</p>
                 <p><strong>提出日時:</strong> ${new Date(dataForPdf.submissionDate).toLocaleString('ja-JP')}</p>
-                <p><strong>正答率:</strong> ${dataForPdf.grading.totalScore} / ${dataForPdf.grading.totalQuestions} (${(dataForPdf.grading.totalScore/dataForPdf.grading.totalQuestions*100).toFixed(1)}%)</p>
+                <p><strong>正答率:</strong> ${dataForPdf.grading.totalScore} / ${dataForPdf.grading.totalQuestions} (${(dataForPdf.grading.totalScore/dataForPdf.grading.totalQuestions*100).toFixed(1)}%)</p>`;
 
-                <h2>課題1：複数の状態変化の比較</h2>
-                <h3>解答</h3>
-                <p>問1: ${getSelectedText('q78_1')} (${dataForPdf.grading.q1.details.q78_1 ? "正解" : "不正解"})</p>
-                <p>問2: ${getSelectedText('q78_2')} (${dataForPdf.grading.q1.details.q78_2 ? "正解" : "不正解"})</p>
-                <p>問3: ${getSelectedText('q78_3')} (${dataForPdf.grading.q1.details.q78_3 ? "正解" : "不正解"})</p>
-                <h3>シミュレーションと考察</h3>
-                <p><strong>理解度:</strong> ${u_text(dataForPdf.q1.understanding)}</p>
-                <p><strong>方法:</strong></p><pre>${formatMethod(dataForPdf.q1.method)}</pre>
-                <p><strong>スクリーンショット:</strong></p>${dataForPdf.q1.screenshot ? `<img src="${dataForPdf.q1.screenshot}">` : '<p>なし</p>'}
-                <p><strong>考察:</strong></p><pre>${escapeHtml(dataForPdf.q1.findings) || '（未記入）'}</pre>
+        const questionDetails = {
+            q1: { title: "課題1：複数の状態変化の比較", answers: ["q78_1", "q78_2", "q78_3"] },
+            q2: { title: "課題2：熱機関のサイクル", answers: ["q79_1", "q79_2", "q79_3_1", "q79_3_2", "q79_3_3_W", "q79_3_3_Q"] },
+            q3: { title: "課題3：断熱変化と等温変化の性質の比較", answers: ["q83_1"] },
+            q4: { title: "課題4：断熱圧縮における物理量の変化", answers: ["q73_1"] }
+        };
 
-                <h2>課題2：熱機関のサイクル</h2>
-                <h3>解答</h3>
-                <p>問1: ${getSelectedText('q79_1')} (${dataForPdf.grading.q2.details.q79_1 ? "正解" : "不正解"})</p>
-                <p>問2: ${getSelectedText('q79_2')} (${dataForPdf.grading.q2.details.q79_2 ? "正解" : "不正解"})</p>
-                <p>問3(1): ${getSelectedText('q79_3_1')} (${dataForPdf.grading.q2.details.q79_3_1 ? "正解" : "不正解"})</p>
-                <p>問3(2): ${getSelectedText('q79_3_2')} (${dataForPdf.grading.q2.details.q79_3_2 ? "正解" : "不正解"})</p>
-                <p>問3(3) 仕事W: ${getSelectedText('q79_3_3_W')} (${dataForPdf.grading.q2.details.q79_3_3_W ? "正解" : "不正解"})</p>
-                <p>問3(3) 熱量Q: ${getSelectedText('q79_3_3_Q')} (${dataForPdf.grading.q2.details.q79_3_3_Q ? "正解" : "不正解"})</p>
-                <h3>シミュレーションと考察</h3>
-                <p><strong>理解度:</strong> ${u_text(dataForPdf.q2.understanding)}</p>
-                <p><strong>方法:</strong></p><pre>${formatMethod(dataForPdf.q2.method)}</pre>
-                <p><strong>結果:</strong></p><pre>${escapeHtml(dataForPdf.q2.results) || '（未記入）'}</pre>
-                <p><strong>スクリーンショット:</strong></p>${dataForPdf.q2.screenshot ? `<img src="${dataForPdf.q2.screenshot}">` : '<p>なし</p>'}
-                <p><strong>考察:</strong></p><pre>${escapeHtml(dataForPdf.q2.findings) || '（未記入）'}</pre>
+        for (const [qKey, details] of Object.entries(questionDetails)) {
+            const qData = dataForPdf[qKey];
+            if (!qData) continue;
+            
+            reportHtml += `<h2>${details.title}</h2><h3>解答</h3>`;
+            details.answers.forEach(ansKey => {
+                const questionText = document.querySelector(`label[for=${ansKey}], select[id=${ansKey}]`).closest('div, p').previousElementSibling.textContent;
+                reportHtml += `<p>${questionText.trim()} ${getSelectedText(ansKey)} (${dataForPdf.grading[qKey].details[ansKey] ? "正解" : "不正解"})</p>`;
+            });
 
-                <h2>課題3：断熱変化と等温変化の性質の比較</h2>
-                <h3>解答</h3>
-                <p>問1: ${getSelectedText('q83_1')} (${dataForPdf.grading.q3.details.q83_1 ? "正解" : "不正解"})</p>
-                <h3>シミュレーションと考察</h3>
-                <p><strong>理解度:</strong> ${u_text(dataForPdf.q3.understanding)}</p>
-                <p><strong>方法:</strong></p><pre>${formatMethod(dataForPdf.q3.method)}</pre>
-                <p><strong>スクリーンショット:</strong></p>${dataForPdf.q3.screenshot ? `<img src="${dataForPdf.q3.screenshot}">` : '<p>なし</p>'}
-                <p><strong>考察:</strong></p><pre>${escapeHtml(dataForPdf.q3.findings) || '（未記入）'}</pre>
-                
-                <h2>課題4：断熱圧縮における物理量の変化</h2>
-                <h3>解答</h3>
-                <p>問1: ${getSelectedText('q73_1')} (${dataForPdf.grading.q4.details.q73_1 ? "正解" : "不正解"})</p>
-                <h3>シミュレーションと考察</h3>
-                <p><strong>理解度:</strong> ${u_text(dataForPdf.q4.understanding)}</p>
-                <p><strong>方法:</strong></p><pre>${formatMethod(dataForPdf.q4.method)}</pre>
-                <p><strong>結果:</strong></p><pre>${escapeHtml(dataForPdf.q4.results) || '（未記入）'}</pre>
-                <p><strong>考察:</strong></p><pre>${escapeHtml(dataForPdf.q4.findings) || '（未記入）'}</pre>
-            </div>
-        `;
+            reportHtml += `<h3>シミュレーションと考察</h3>
+                <p><strong>理解度:</strong> ${u_text(qData.understanding)}</p>
+                <p><strong>方法:</strong></p><pre>${formatMethod(qData.method)}</pre>`;
+            
+            if(qData.results) {
+                 reportHtml += `<p><strong>結果:</strong></p><pre>${escapeHtml(qData.results) || '（未記入）'}</pre>`;
+            }
+            
+            reportHtml += `<p><strong>スクリーンショット:</strong></p>${qData.screenshot ? `<img src="${qData.screenshot}">` : '<p>なし</p>'}
+                <p><strong>考察:</strong></p><pre>${escapeHtml(qData.findings) || '（未記入）'}</pre>`;
+        }
+        reportHtml += '</div>';
 
         const renderContainer = document.createElement('div');
         renderContainer.style.position = 'absolute';
@@ -665,15 +630,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         try {
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF({
-                orientation: 'p',
-                unit: 'mm',
-                format: 'a4'
-            });
-
+            const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
             const content = document.getElementById('pdf-render-area');
             
-            await html2canvas(content, {
+            const canvas = await html2canvas(content, {
                 scale: 2,
                 useCORS: true,
                 onclone: (doc) => {
@@ -682,43 +642,41 @@ document.addEventListener('DOMContentLoaded', () => {
                     link.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap';
                     doc.head.appendChild(link);
                 }
-            }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const imgProps= pdf.getImageProperties(imgData);
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-                let heightLeft = pdfHeight;
-                let position = 0;
-                
-                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight, undefined, 'FAST');
-                heightLeft -= pdf.internal.pageSize.getHeight();
-                
-                while (heightLeft >= 0) {
-                  position = heightLeft - pdfHeight;
-                  pdf.addPage();
-                  pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight, undefined, 'FAST');
-                  heightLeft -= pdf.internal.pageSize.getHeight();
-                }
-
-                pdf.save(`thermo_report_${dataForPdf.studentId}_${dataForPdf.studentName.replace(/\s/g, '_')}.pdf`);
             });
+
+            const imgData = canvas.toDataURL('image/png');
+            const imgProps= pdf.getImageProperties(imgData);
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            let heightLeft = pdfHeight;
+            let position = 0;
+            
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight, undefined, 'FAST');
+            heightLeft -= pdf.internal.pageSize.getHeight();
+            
+            while (heightLeft >= 0) {
+              position = heightLeft - pdfHeight;
+              pdf.addPage();
+              pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight, undefined, 'FAST');
+              heightLeft -= pdf.internal.pageSize.getHeight();
+            }
+
+            pdf.save(`thermo_report_${dataForPdf.studentId}_${dataForPdf.studentName.replace(/\s/g, '_')}.pdf`);
         } catch (error) {
             console.error("PDF生成に失敗しました:", error);
             alert("PDFの生成に失敗しました。コンソールを確認してください。");
         } finally {
             document.body.removeChild(renderContainer);
-            exportPdfBtn.disabled = false;
-            exportPdfBtn.textContent = 'PDFへ書き出し';
+            btn.disabled = false;
+            btn.textContent = 'PDFへ書き出し';
         }
     });
 
     const loadJsonInput = document.getElementById('load-json-input');
     loadJsonInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
-        if (!file) {
-            return;
-        }
+        if (!file) { return; }
 
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -742,9 +700,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.answers) {
             for (const [key, value] of Object.entries(data.answers)) {
                 const selectElement = document.getElementById(key);
-                if (selectElement) {
-                    selectElement.value = value;
-                }
+                if (selectElement) { selectElement.value = value; }
             }
         }
         
@@ -754,10 +710,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const methodContainer = document.getElementById(`${qKey}-method-steps`);
             if (methodContainer && qValue.method) {
-                methodContainer.innerHTML = ''; // クリア
-                qValue.method.forEach(stepData => {
-                    methodContainer.appendChild(createMethodStep(stepData));
-                });
+                methodContainer.innerHTML = '';
+                qValue.method.forEach(stepData => methodContainer.appendChild(createMethodStep(stepData)));
             }
             
             const findings = document.getElementById(`${qKey}-findings`);
