@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>熱力学探求ポータル</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0KOVEMVIhbGKLCePo231CVQSHcLesaPSAHUsqAPLC2HSSg52OzwlW" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .katex-display {
+            margin: 1em 0;
+        }
+        .link-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        /* Style for active accordion header */
+        .accordion-header.active {
+            background-color: #f0f9ff; /* sky-50 */
+        }
+        .accordion-header.active span {
+            color: #0369a1; /* sky-700 */
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        
+        <header class="text-center mb-16 p-8 md:p-12 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400 text-white shadow-lg">
+            <h1 class="text-4xl md:text-5xl font-bold">熱力学探求ポータル</h1>
+            <p class="mt-4 text-lg opacity-90">基礎から応用、そして未来へ。熱の世界を深く探求しよう。</p>
+        </header>
+
+        <section id="links" class="mb-16">
+            <h2 class="text-3xl font-bold text-center mb-10 text-slate-700">学習コンテンツ</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="https://takeruhonda.github.io/physics-thermo-sim/Slide_Heat_physics_2025_6.html" target="_blank" rel="noopener noreferrer" class="link-card block bg-white rounded-lg shadow-md overflow-hidden border border-gray-200/80">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-sky-800 flex items-center">
+                            <span>熱力学の歴史</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                        </h3>
+                        <p class="text-gray-600 mt-2">火の発見から生命の謎まで、熱の正体をめぐる科学者たちの壮大な探求の物語をたどります。</p>
+                    </div>
+                </a>
+                <a href="https://takeruhonda.github.io/physics-thermo-sim/Heat_physics_2025_6.html" target="_blank" rel="noopener noreferrer" class="link-card block bg-white rounded-lg shadow-md overflow-hidden border border-gray-200/80">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-sky-800 flex items-center">
+                            <span>インタラクティブ熱力学</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                        </h3>
+                        <p class="text-gray-600 mt-2">シミュレーターを使い、熱力学の法則をインタラクティブに体感。ミクロの世界から熱機関までをカバーします。</p>
+                    </div>
+                </a>
+                <a href="https://takeruhonda.github.io/physics-thermo-sim/Report_Heat_physics_2025_4.html" target="_blank" rel="noopener noreferrer" class="link-card block bg-white rounded-lg shadow-md overflow-hidden border border-gray-200/80">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-sky-800 flex items-center">
+                            <span>シミュレーション実験</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                        </h3>
+                        <p class="text-gray-600 mt-2">サイクルビルダーを使い、熱力学サイクルを設計・分析。課題に取り組み、レポートを作成・提出できます。</p>
+                    </div>
+                </a>
+                 <a href="https://takeruhonda.github.io/physics-thermo-sim/Slide_Heat2_physics_2025_1.html" target="_blank" rel="noopener noreferrer" class="link-card block bg-white rounded-lg shadow-md overflow-hidden border border-gray-200/80">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-sky-800 flex items-center">
+                            <span>熱力学と産業革命</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                        </h3>
+                        <p class="text-gray-600 mt-2">熱機関がどのように社会を変革し、現代文明の礎を築いたのかを学びます。</p>
+                    </div>
+                </a>
+                <a href="https://takeruhonda.github.io/physics-thermo-sim/Q_Heat_physics_2025_1.html" target="_blank" rel="noopener noreferrer" class="link-card block bg-white rounded-lg shadow-md overflow-hidden border border-gray-200/80">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-sky-800 flex items-center">
+                            <span>理解度チェック</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                        </h3>
+                        <p class="text-gray-600 mt-2">クイズ形式で熱力学の各単元の理解度を確認。学習の成果をレポートとしてまとめることも可能です。</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section id="questions">
+            <h2 class="text-3xl font-bold text-center mb-10 text-slate-700">探求の問い</h2>
+            <div class="space-y-4 max-w-4xl mx-auto">
+                <div class="bg-white rounded-lg shadow-md border border-gray-200/80">
+                    <button class="accordion-header w-full text-left p-6 flex justify-between items-center rounded-lg">
+                        <span class="text-lg font-semibold text-slate-800">「宇宙の終わり方の一つに『熱的死』というシナリオがあるらしい。それはどんな状態で、なぜそうなるの？」</span>
+                        <svg class="w-6 h-6 transform transition-transform text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-gray-700 leading-relaxed">
+                        <p class="mb-4">「熱的死」とは、<strong>熱力学第二法則</strong>が宇宙全体に適用された結果として予測される、宇宙の最終状態の一つです。</p>
+                        <h4 class="font-bold mt-4 mb-2 text-slate-600">どんな状態？</h4>
+                        <p>一言で言えば、「<strong>究極ののっぺりとした状態</strong>」です。宇宙全体が完全に熱平衡に達し、あらゆる場所で温度とエネルギー密度が均一になります。具体的には、</p>
+                        <ul class="list-disc list-inside ml-4 space-y-2 mb-4">
+                            <li>すべての恒星は燃え尽き、ブラックホールもホーキング放射によって蒸発し、物質は素粒子レベルまで崩壊します。</li>
+                            <li>エネルギーは宇宙全体に均等に拡散し、どこにも温度差が存在しなくなります。</li>
+                            <li>エントロピー（乱雑さ）が最大となり、これ以上変化の起こりようがない、静かで冷たい状態です。</li>
+                        </ul>
+                        <p>温度差がなければ熱の移動は起こらず、熱を仕事に変える熱機関も作動できません。つまり、生命活動を含め、いかなる物理現象も起こらなくなる「死んだ」宇宙です。</p>
+                        
+                        <h4 class="font-bold mt-4 mb-2 text-slate-600">なぜそうなるの？</h4>
+                        <p>これは<strong>熱力学第二法則</strong>、特に「<strong>エントロピー増大の法則</strong>」に基づいています。この法則は「孤立した系（外部とエネルギーや物質のやり取りがない系）では、エントロピーは時間とともに増大し、決して減少しない」というものです。</p>
+                        <p>宇宙全体を一つの巨大な孤立した系と考えると、コーヒーにミルクが混ざると元に戻らないように、宇宙で起こるあらゆる現象は、全体としてより乱雑な（エントロピーが高い）方向へと不可逆的に進んでいきます。星が輝くのも、生命が活動するのも、局所的には秩序を形成していますが、その過程で必ず周囲に熱を放出し、宇宙全体のエントロピーを増大させています。このプロセスが永遠に続いた先にあるのが、エントロピーが最大に達した「熱的死」というわけです。</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md border border-gray-200/80">
+                    <button class="accordion-header w-full text-left p-6 flex justify-between items-center rounded-lg">
+                        <span class="text-lg font-semibold text-slate-800">「砂漠の真ん中に、電気を使わずに氷を作り出す装置を設計できるだろうか？」</span>
+                        <svg class="w-6 h-6 transform transition-transform text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-gray-700 leading-relaxed">
+                        <p class="mb-4">はい、可能です。これは「<strong>放射冷却</strong>」という現象を利用することで実現できます。古代ペルシャでは「ヤフチャール」という氷室で実際に氷が作られていました。</p>
+                        <h4 class="font-bold mt-4 mb-2 text-slate-600">基本原理：放射冷却</h4>
+                        <ul class="list-disc list-inside ml-4 space-y-2 mb-4">
+                            <li>地球上のすべての物体は、その温度に応じた熱を赤外線として放射しています（熱放射）。</li>
+                            <li>同時に、周囲の大気や地面からも熱放射を受け取っています。</li>
+                            <li>砂漠のような乾燥地帯では、夜間は雲（水蒸気）が少なく、空は宇宙に向かって「開いて」います。宇宙空間の温度は絶対温度3K（約-270℃）と極めて低温です。</li>
+                            <li>このため、地面にある物体は、大気から受け取る熱よりも多くの熱を宇宙空間へ放射します。この熱の収支がマイナスになることで、物体の温度は周囲の気温よりも低くなります。これが放射冷却です。</li>
+                        </ul>
+                        <h4 class="font-bold mt-4 mb-2 text-slate-600">装置の設計案</h4>
+                        <p>この原理を最大限に活用する装置は以下のように設計できます。</p>
+                        <ol class="list-decimal list-inside ml-4 space-y-2">
+                            <li><strong>断熱された浅い水盤：</strong> 地面からの熱伝導を防ぐため、木材やおがくずなどの断熱材で囲まれた、浅くて広い水盤を用意します。</li>
+                            <li><strong>黒い内面：</strong> 水盤の内側を黒く塗ります。黒い物体は熱の放射率が高いため、効率よく宇宙へ熱を放出できます。</li>
+                            <li><strong>対流を防ぐ覆い（オプション）：</strong> 風によって暖かい空気が水面に触れると、冷却が妨げられます。これを防ぐため、赤外線を透過しやすい素材（特殊なフィルムなど）で水盤の上部を覆うとさらに効果的です。</li>
+                        </ol>
+                        <div class="bg-slate-100 p-4 rounded-md mt-4 border-l-4 border-sky-500">
+                            <strong>実行条件：</strong> この方法は、風が弱く、空気が乾燥し、雲一つない晴れた夜に最も効果を発揮します。砂漠の夜はこれらの条件を満たすため、氷作りには理想的な環境と言えます。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md border border-gray-200/80">
+                    <button class="accordion-header w-full text-left p-6 flex justify-between items-center rounded-lg">
+                        <span class="text-lg font-semibold text-slate-800">「都会で発生する『ヒートアイランド現象』を、熱力学の知識を使って緩和する方法を提案してください。」</span>
+                        <svg class="w-6 h-6 transform transition-transform text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-gray-700 leading-relaxed">
+                        <p class="mb-4">ヒートアイランド現象は、都市部がコンクリートやアスファルトによる熱の吸収、エアコンや自動車からの排熱などにより、周辺の郊外よりも気温が高くなる現象です。これを熱力学の3つの伝熱形態（<strong>伝導、対流、放射</strong>）と熱力学第一法則の観点から緩和する方法が考えられます。</p>
+                        
+                        <h4 class="font-bold mt-4 mb-2 text-slate-600">1. 放射（輻射）対策：熱の吸収を減らす</h4>
+                        <p>都市の表面温度上昇の最大の原因は、日射を吸収しやすい素材です。これを対策します。</p>
+                        <ul class="list-disc list-inside ml-4">
+                            <li><strong>クールルーフ・クールペイブメント：</strong> 建物の屋根や道路を、太陽光をよく反射する（アルベドが高い）白や明るい色の素材にします。これにより、放射による熱の吸収量($Q_{in}$)そのものを減らします。</li>
+                        </ul>
+
+                        <h4 class="font-bold mt-4 mb-2 text-slate-600">2. 対流・蒸発散による冷却</h4>
+                        <p>吸収された熱を効率的に運び去る、あるいは別のエネルギーに変換する方法です。</p>
+                        <ul class="list-disc list-inside ml-4 space-y-2">
+                            <li><strong>緑化の推進（蒸発散）：</strong> 公園や屋上緑化、街路樹を増やします。植物は根から吸い上げた水を葉から蒸散させます。水が液体から気体に変わる際には、周囲から大量の熱（気化熱）を奪うため、空気が冷却されます。</li>
+                            <li><strong>水辺空間の創出：</strong> 噴水や親水公園、打ち水なども同様に気化熱を利用した冷却方法です。</li>
+                            <li><strong>風の道の確保（対流）：</strong> 建物の配置を工夫して、涼しい海風や川沿いの風が都市内部まで通り抜ける「風の道」を設計します。これにより、熱い空気が滞留せず、自然な対流によって熱が運び去られます。</li>
+                        </ul>
+
+                        <h4 class="font-bold mt-4 mb-2 text-slate-600">3. 人工排熱の削減</h4>
+                        <p>熱力学第一法則 $\Delta U = Q + W$ の観点から、都市活動に伴う不要な熱（仕事以外の排熱）を減らします。</p>
+                        <ul class="list-disc list-inside ml-4 space-y-2">
+                            <li><strong>省エネルギー化：</strong> 建物の断熱性能を高めて冷房効率を上げる、エネルギー効率の高い機器を使用するなどして、そもそも排出される熱量を削減します。</li>
+                            <li><strong>交通システムの改善：</strong> 公共交通機関の利用促進や電気自動車（EV）への転換により、自動車からの排熱を減らします。（※EVも発電所では熱を排出しますが、都市部での排熱集中は緩和されます。）</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // KaTeX rendering
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ]
+            });
+            
+            // Accordion logic
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('svg');
+
+                    // Toggle active class for styling
+                    const isActive = header.classList.contains('active');
+
+                    // Close all accordions first
+                    accordionHeaders.forEach(otherHeader => {
+                        otherHeader.classList.remove('active');
+                        otherHeader.nextElementSibling.style.maxHeight = null;
+                        otherHeader.querySelector('svg').style.transform = 'rotate(0deg)';
+                    });
+
+                    // If the clicked one wasn't active, open it
+                    if (!isActive) {
+                        header.classList.add('active');
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
