@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>熱機関と産業革命：物理が世界をどう変えたか</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0KOVEMcApdbeGUPZQpVmvsaVDPvAL9A/s9GEZR2u24LHrNJnsA9M2" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlVjOTmhdwKRsEcsqcFdeNfkIQOdFKehMGIORNpInWxEZuL7YhitJWjXfnU" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: #f0f2f5;
+        }
+        .slide {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
+        }
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+        .slide-content {
+            width: 100%;
+            max-width: 1000px;
+            margin: auto;
+            padding: 2rem;
+        }
+        .slide-image {
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            margin: 1.5rem auto;
+        }
+        .caption {
+            font-size: 0.8rem;
+            text-align: center;
+            color: #6b7280;
+            margin-top: -1rem;
+            padding-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="w-screen h-screen overflow-hidden">
+
+    <div id="slides-container" class="relative w-full h-full bg-gray-100">
+
+        <div class="slide active items-center justify-center text-center bg-slate-800 text-white">
+            <div class="slide-content">
+                <h1 class="text-5xl md:text-6xl font-bold mb-4">熱機関と産業革命</h1>
+                <p class="text-2xl md:text-3xl font-light">物理が世界をどう変えたか</p>
+                <p class="mt-8 text-lg text-gray-300">高校物理「熱力学」発展学習</p>
+            </div>
+        </div>
+
+        <div class="slide items-center justify-center bg-white">
+            <div class="slide-content text-gray-800">
+                <h2 class="text-4xl font-bold mb-6 text-center text-slate-700">そもそも「熱機関」とは？</h2>
+                <div class="text-xl space-y-4">
+                    <p>熱機関は、<span class="font-bold text-sky-600">熱</span>を利用して、ものを動かすための<span class="font-bold text-amber-600">力学的な仕事</span>を取り出す装置のことです。</p>
+                    <div class="my-6 p-6 border-2 border-slate-200 rounded-lg bg-slate-50">
+                        <p class="text-center text-2xl font-bold">熱 (フロー) → → → → → 仕事 (動力)</p>
+                    </div>
+                    <p>高校物理で学ぶ<span class="font-bold">熱力学第一法則</span>や<span class="font-bold">カルノーサイクル</span>が、この変換の原理を説明しています。</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="slide items-center justify-center bg-white">
+            <div class="slide-content text-gray-800">
+                <h2 class="text-4xl font-bold mb-6 text-center text-slate-700">産業革命以前の世界</h2>
+                <p class="text-xl mb-8 text-center">動力は、自然の力や動物、人間の力に頼っていました。</p>
+                <div class="grid md:grid-cols-3 gap-6 text-center">
+                    <div class="p-6 bg-green-100 rounded-lg">
+                        <h3 class="text-2xl font-bold mb-2">人力・畜力</h3>
+                        <p>農作業や輸送の中心。パワーも範囲も限定的。</p>
+                    </div>
+                    <div class="p-6 bg-blue-100 rounded-lg">
+                        <h3 class="text-2xl font-bold mb-2">水力</h3>
+                        <p>水車を使い、粉ひきなどに利用。川の近くにしか作れない。</p>
+                    </div>
+                    <div class="p-6 bg-yellow-100 rounded-lg">
+                        <h3 class="text-2xl font-bold mb-2">風力</h3>
+                        <p>風車で揚水や製粉。天候に左右される不安定さ。</p>
+                    </div>
+                </div>
+                <p class="text-xl mt-8 text-center font-bold">生産性は低く、天候や地理的な制約に大きく縛られていました。</p>
+            </div>
+        </div>
+
+        <div class="slide items-center justify-center bg-white">
+            <div class="slide-content text-gray-800">
+                <h2 class="text-4xl font-bold mb-4 text-center text-slate-700">ゲームチェンジャー：蒸気機関の登場</h2>
+                <p class="text-xl text-center mb-6">ジェームズ・ワットによる改良で、蒸気機関は実用的な動力源となりました。</p>
+                <img src="Figure/Wat.png" alt="ワットの蒸気機関" class="slide-image" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/475569?text=ワットの蒸気機関';">
+                <p class="caption">出典: https://www.japanjournals.com/index.php?option=com_content&view=article&id=1166%3A2011-08-04-11-37-18&catid=72%3Asurvivor&Itemid=103&limitstart=1</p>
+                <p class="text-xl">石炭を燃やして得た<span class="font-bold text-red-500">熱</span>で水を沸騰させ、発生した高温・高圧の蒸気がピストンを押すことで<span class="font-bold text-green-600">仕事</span>を取り出します。これが「熱から仕事への変換」の具体的な応用例です。</p>
+                <p class="text-xl mt-4"><span class="font-bold">場所を選ばず、天候にも左右されない、強力で安定した動力</span>が初めて人類の手に。</p>
+            </div>
+        </div>
+        
+        <div class="slide items-center justify-center bg-white">
+            <div class="slide-content text-gray-800">
+                <h2 class="text-4xl font-bold mb-6 text-center text-slate-700">蒸気機関を物理で見てみよう</h2>
+                <p class="text-xl mb-6 text-center">蒸気機関の仕組みは、熱力学のモデルで説明できます。</p>
+                <div class="w-full max-w-2xl mx-auto p-6 border-4 border-gray-300 rounded-xl bg-gray-50">
+                    <div class="text-center mb-4">
+                        <div class="text-lg font-bold p-3 bg-red-200 rounded-t-lg">高温熱源 (ボイラー)</div>
+                        <div class="text-2xl font-bold text-red-600">Q_in (熱の吸収)</div>
+                        <div class="text-4xl">↓</div>
+                    </div>
+                    <div class="text-center p-4 bg-yellow-200 rounded-lg">
+                        <h3 class="text-2xl font-bold">シリンダー内の蒸気 (仕事をする物体)</h3>
+                    </div>
+                    <div class="flex justify-between items-center mt-4">
+                        <div class="text-center">
+                            <div class="text-4xl">→</div>
+                            <div class="text-2xl font-bold text-green-600">W (外部への仕事)</div>
+                            <p class="font-bold">(ピストンを動かす)</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl">↓</div>
+                             <div class="text-2xl font-bold text-blue-600">Q_out (熱の放出)</div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                         <div class="text-lg font-bold p-3 bg-blue-200 rounded-b-lg">低温熱源 (冷却器)</div>
+                    </div>
+                </div>
+                 <p class="text-xl mt-6 text-center">ボイラーで吸収した熱 $Q_{in}$ で蒸気が膨張し、ピストンを押して仕事 $W$ をします。仕事を終えた蒸気は冷却され、熱 $Q_{out}$ を放出して水に戻ります。このサイクルが熱機関の基本です。</p>
+            </div>
+        </div>
+
+        <div class="slide items-center justify-center bg-white">
+            <div class="slide-content text-gray-800">
+                <h2 class="text-4xl font-bold mb-6 text-center text-slate-700">数式が拓いた「効率化」への道</h2>
+                <p class="text-xl mb-8 text-center">経験と勘に頼っていた熱機関の開発は、数式によって「科学」になりました。</p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="p-6 bg-blue-50 rounded-lg border-2 border-blue-200 h-full flex flex-col">
+                        <h3 class="text-2xl font-bold mb-3 text-blue-800">① 熱力学第一法則</h3>
+                        <p class="text-lg mb-4 flex-grow">内部エネルギーの変化、加えられた熱、された仕事の関係を示す<span class="font-bold">エネルギー保存則</span>です。</p>
+                        <div class="text-center p-4 bg-white rounded-md shadow-inner my-4">
+                            <span class="text-2xl">$$\Delta U = Q_{in} - W$$</span>
+                        </div>
+                        <p class="text-lg mt-auto">これにより、熱機関のエネルギー収支を定量的に分析できるようになりました。</p>
+                    </div>
+                    <div class="p-6 bg-green-50 rounded-lg border-2 border-green-200 h-full flex flex-col">
+                        <h3 class="text-2xl font-bold mb-3 text-green-800">② 熱効率の定義</h3>
+                        <p class="text-lg mb-4 flex-grow">投入した熱が、どれだけ有効な仕事に変換されたかを示す<span class="font-bold">「性能指標」</span>です。</p>
+                        <div class="text-center p-4 bg-white rounded-md shadow-inner my-4">
+                             <span class="text-2xl">$$e = \frac{W}{Q_{in}} = 1 - \frac{Q_{out}}{Q_{in}}$$</span>
+                        </div>
+                        <p class="text-lg mt-auto">技術者たちは、この $e$ を最大化することを目標に改良を重ね、エネルギー効率を飛躍的に高めました。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide items-center justify-center bg-white">
+            <div class="slide-content text-gray-800">
+                <h2 class="text-4xl font-bold mb-6 text-center text-slate-700">社会への影響①：工場の誕生と大量生産</h2>
+                <p class="text-xl mb-6 text-center">蒸気機関は繊維工場などの機械を動かす動力源となりました。</p>
+                <img src="Figure/power-loom-weaving-great-britain-industrial-revolution-allom-1835.jpg" alt="産業革命期の工場" class="slide-image" onerror="this.onerror=null;this.src='https://placehold.co/600x300/e2e8f0/475569?text=産業革命期の工場';">
+                <p class="caption">出典: 1835年に描かれた機械式織機のイラスト。動力源として水車や蒸気機関が使用されていた。Source: T. Allom. “Illustration of power loom weaving.” in History of the Cotton Manufacture in Great Britain by Edward Baines. Licensed under CC-0.</p>
+                <ul class="text-xl list-disc list-inside space-y-3">
+                    <li><span class="font-bold">家内制手工業から工場制機械工業へ</span></li>
+                    <li>天候や時間に関係なく、<span class="font-bold">24時間機械を動かす</span>ことが可能に。</li>
+                    <li>製品の<span class="font-bold text-teal-600">大量生産</span>が始まり、安価な製品が市場に出回った。</li>
+                    <li>多くの労働者が都市に集まり、<span class="font-bold">都市化</span>が急速に進んだ。</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="slide items-center justify-center bg-white">
+            <div class="slide-content text-gray-800">
+                <h2 class="text-4xl font-bold mb-6 text-center text-slate-700">社会への影響②：交通革命</h2>
+                <p class="text-xl mb-6 text-center">熱機関は、人々の移動と物流のあり方を根本から変えました。</p>
+                <img src="Figure/kurofune1.jpg" alt="蒸気機関車" class="slide-image" onerror="this.onerror=null;this.src='https://placehold.co/600x300/e2e8f0/475569?text=蒸気機関車';">
+                <p class="caption">出典: https://hinomotoo.com/kurofune3/、サスケハナ号（浦賀コミュニティーセンター分館）</p>
+                 <div class="grid md:grid-cols-2 gap-6 text-xl">
+                    <div class="p-4 bg-gray-200 rounded-lg">
+                        <h3 class="font-bold text-2xl mb-2">蒸気機関車</h3>
+                        <p>大量の物資や人を、馬車より速く、安く、遠くまで運ぶことを可能にした。</p>
+                    </div>
+                    <div class="p-4 bg-sky-200 rounded-lg">
+                        <h3 class="font-bold text-2xl mb-2">蒸気船</h3>
+                        <p>風や海流に頼らず航海できるようになり、国際貿易を飛躍的に発展させた。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="slide items-center justify-center bg-white">
+            <div class="slide-content text-gray-800">
+                <h2 class="text-4xl font-bold mb-6 text-center text-slate-700">理論から応用へ：現代エンジンへの道筋</h2>
+                <p class="text-xl mb-8 text-center">熱力学の数式と蒸気機関の知見が、現代のエンジンやタービンの基礎を築きました。</p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="p-6 bg-gray-50 rounded-lg border-2 border-gray-200 h-full">
+                        <h3 class="text-2xl font-bold mb-3 text-gray-800">基礎となった理論と知見</h3>
+                        <div class="space-y-4 text-lg">
+                            <div>
+                                <p class="font-bold">▶︎ 熱力学の数式から</p>
+                                <ul class="list-disc list-inside ml-4">
+                                    <li><span class="font-bold">エネルギー収支の可視化</span><br>($ \Delta U = Q_{in} - W $)</li>
+                                    <li><span class="font-bold">性能向上の指標</span><br>(熱効率 $e = W/Q_{in}$)</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <p class="font-bold">▶︎ 蒸気機関の知見から</p>
+                                <ul class="list-disc list-inside ml-4">
+                                    <li>高圧の気体（作動流体）が大きな仕事を生む。</li>
+                                    <li>熱源の温度を上げると効率が向上する。</li>
+                                    <li>連続運転のための「サイクル」という概念。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 bg-sky-50 rounded-lg border-2 border-sky-200 h-full">
+                        <h3 class="text-2xl font-bold mb-3 text-sky-800">現代のエンジン・タービンへの応用</h3>
+                        <div class="space-y-4 text-lg">
+                            <div>
+                                <h4 class="font-bold text-xl">自動車エンジン (内燃機関)</h4>
+                                <p class="ml-4">熱源を<span class="font-bold">外部から内部での燃焼に</span>変え、小型・高効率化。</p>
+                                <img src="Figure/car_phd1.jpg" alt="4ストロークエンジン" class="my-2 mx-auto h-24 rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/200x100/e0f2fe/075985?text=内燃機関';">
+                                <p class="caption text-xs">出典: https://sora-bana.com/engine2</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-xl">発電タービン (外燃機関)</h4>
+                                <p class="ml-4">ピストン運動を<span class="font-bold">連続的な回転運動に</span>変え、巨大な動力を得る方式へ発展。</p>
+                                <img src="Figure/jema_illust_fire_02-03.png" alt="蒸気タービン" class="my-2 mx-auto h-24 rounded-md bg-white p-1" onerror="this.onerror=null;this.src='https://placehold.co/200x100/e0f2fe/075985?text=蒸気タービン';">
+                                 <p class="caption text-xs">出典: https://www.jema-net.or.jp/energy/thermal.html</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide items-center justify-center bg-white">
+            <div class="slide-content text-gray-800">
+                <h2 class="text-4xl font-bold mb-6 text-center text-slate-700">熱機関の遺産と現代社会</h2>
+                <p class="text-xl mb-8 text-center">産業革命の蒸気機関から始まった熱機関の原理は、形を変えて現代でも使われ続けています。</p>
+                <div class="grid md:grid-cols-3 gap-6 text-center">
+                    <div class="p-4 bg-red-100 rounded-lg">
+                        <h3 class="text-2xl font-bold mb-2">自動車のエンジン</h3>
+                        <p>(内燃機関)</p>
+                    </div>
+                    <div class="p-4 bg-blue-100 rounded-lg">
+                        <h3 class="text-2xl font-bold mb-2">火力・原子力発電所</h3>
+                        <p>(蒸気タービン)</p>
+                    </div>
+                    <div class="p-4 bg-gray-100 rounded-lg">
+                        <h3 class="text-2xl font-bold mb-2">ジェットエンジン</h3>
+                        <p>(ガスタービン)</p>
+                    </div>
+                </div>
+                <p class="text-xl mt-8 text-center">一方で、化石燃料の大量消費による<span class="font-bold">環境問題</span>は、熱機関がもたらした現代的な課題でもあります。</p>
+            </div>
+        </div>
+
+        <div class="slide items-center justify-center bg-sky-700 text-white">
+            <div class="slide-content text-center">
+                <h2 class="text-4xl font-bold mb-6">まとめ</h2>
+                <div class="text-xl space-y-4 text-left max-w-3xl mx-auto">
+                    <p>✅ 熱機関は<span class="font-bold">熱を仕事に変える</span>装置であり、その発明が産業革命の原動力となった。</p>
+                    <p>✅ 蒸気機関は、<span class="font-bold">生産体制（工場）と交通（鉄道・船）</span>に革命をもたらし、社会構造を大きく変えた。</p>
+                    <p>✅ 物理学の法則（熱力学）が、<span class="font-bold">私たちの現代文明の礎を築いた</span>ことを示している。</p>
+                </div>
+                <p class="mt-8 text-2xl font-bold">物理を学ぶことは、世界の仕組みを理解することに繋がります。</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="absolute bottom-0 left-0 right-0 p-4 flex justify-between items-center bg-black bg-opacity-20">
+        <button id="prevBtn" class="px-6 py-3 bg-white text-gray-800 font-bold rounded-full shadow-lg hover:bg-gray-200 transition duration-300">
+            &larr; 前へ
+        </button>
+        <div id="slide-counter" class="text-white font-bold text-lg"></div>
+        <button id="nextBtn" class="px-6 py-3 bg-white text-gray-800 font-bold rounded-full shadow-lg hover:bg-gray-200 transition duration-300">
+            次へ &rarr;
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // KaTeX auto-render execution
+            try {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: "$$", right: "$$", display: true},
+                        {left: "$", right: "$", display: false}
+                    ]
+                });
+            } catch (e) {
+                console.error("KaTeX rendering failed. Make sure the library is loaded.", e);
+            }
+
+            // Slider logic
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const slideCounter = document.getElementById('slide-counter');
+            
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+
+            function showSlide(n) {
+                slides.forEach((slide, index) => {
+                    slide.classList.toggle('active', index === n);
+                });
+                slideCounter.textContent = `${n + 1} / ${totalSlides}`;
+                prevBtn.disabled = n === 0;
+                nextBtn.disabled = n === totalSlides - 1;
+                prevBtn.style.opacity = n === 0 ? '0.5' : '1';
+                nextBtn.style.opacity = n === totalSlides - 1 ? '0.5' : '1';
+            }
+
+            function nextSlide() {
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    showSlide(currentSlide);
+                }
+            }
+
+            function prevSlide() {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    showSlide(currentSlide);
+                }
+            }
+
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+            
+            showSlide(currentSlide);
+        });
+    </script>
+</body>
+</html>

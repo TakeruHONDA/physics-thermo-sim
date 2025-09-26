@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>熱力学の歴史：火の発見から生命の理解まで</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0KOVEMeaOVTGpullwTCKBF1UCDEabscCjk5VkplblIcbucUhsPnH/L" crossorigin="anonymous">
+    
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlVwcjNcsNQpUhbodo2pGnsJQT6dspiHYHenQE9vG5eU2MA2tPNEhI7M6A6" crossorigin="anonymous"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURPiLqzZ1/L2dCR5vRLLA9Mfa4cIfl4sEch7LKEFnQWOnNa1mtCDdM" crossorigin="anonymous"></script>
+    
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background-color: #cbd5e1;
+            top: 0;
+            bottom: 0;
+            left: 31px;
+            margin-left: -3px;
+        }
+        .timeline-item {
+            padding: 10px 0 10px 80px;
+            position: relative;
+            background-color: inherit;
+            width: 100%;
+        }
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            left: 15px;
+            background-color: white;
+            border: 4px solid #6366f1;
+            top: 22px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        .timeline-icon {
+            position: absolute;
+            left: 21px;
+            top: 28px;
+            z-index: 2;
+            color: #4f46e5;
+        }
+        .content {
+            padding: 20px 30px;
+            background-color: white;
+            position: relative;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border-left: 4px solid #818cf8;
+            transition: transform 0.3s ease;
+        }
+        .content:hover {
+            transform: translateY(-5px);
+        }
+        .content h2 { font-size: 1.5rem; font-weight: 700; color: #4338ca; }
+        .content h3 { font-size: 1.2rem; font-weight: 600; margin-top: 5px; }
+        .content p { margin-top: 10px; font-size: 0.95rem; line-height: 1.7; }
+        .tag {
+            display: inline-block;
+            background-color: #e0e7ff;
+            color: #3730a3;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 15px;
+            margin-right: 5px;
+        }
+        .scientist-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            float: right;
+            margin-left: 15px;
+            border: 3px solid #e0e7ff;
+        }
+        .illustration {
+            margin-top: 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e7ff;
+            padding: 10px;
+            background-color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .illustration figure {
+            text-align: center;
+        }
+        .illustration figcaption {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+        table {
+            width: 100%;
+            margin-top: 1rem;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        th {
+            background-color: #f0f4ff;
+            font-weight: 600;
+            color: #3730a3;
+        }
+        tr:nth-child(even) { background-color: #fafbff; }
+        .katex-display { margin: 1em 0; text-align: center; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-indigo-100 text-gray-800">
+
+    <div class="container mx-auto px-4 py-12">
+        <header class="text-center mb-20">
+            <h1 class="text-4xl md:text-5xl font-bold text-indigo-900 mb-4">熱力学の歴史</h1>
+            <p class="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto">
+                火の発見から、産業を動かす力へ、そして生命の謎を解き明かす鍵へ。熱の正体をめぐる壮大な探求の軌跡。
+            </p>
+            <div class="mt-8 p-5 bg-white border-l-4 border-indigo-500 text-indigo-900 rounded-lg shadow-md max-w-3xl mx-auto text-left">
+                <h2 class="font-bold text-lg flex items-center gap-2"><i data-lucide="key-round"></i>重要な概念：エネルギーは「ストック」、熱は「フロー」</h2>
+                <p class="mt-2">物理学では、物体が内部に「持つ」エネルギーを<strong>内部エネルギー（ストック）</strong>と呼びます。一方、<strong>熱（フロー）</strong>とは、温度差によってエネルギーが移動する「過程」そのものを指します。熱は物体が持つ「モノ」ではなく、エネルギーが流れる現象なのです。この区別が、近代熱力学の出発点となりました。</p>
+            </div>
+        </header>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="sparkles"></i></div>
+                <div class="content">
+                    <h2>紀元前4世紀頃</h2>
+                    <h3>古代ギリシャ哲学と四元素</h3>
+                    <p><strong>アリストテレス</strong>に代表される古代ギリシャの哲学者たちは、世界が<strong>火・空気・水・土</strong>の四元素から構成されると考えました。この枠組みでは、「熱」は「火」の元素が持つ基本的な性質とされ、物質の変化を引き起こす能動的な力として哲学的に考察されました。これは科学的な計測以前の、世界の成り立ちを理解しようとする根源的な試みでした。</p>
+                    <div class="illustration">
+                        <figure>
+                            <img src="Figure/Gemini_Generated_Image_glp16mglp16mglp1.png" alt="古代ギリシャの四元素説" style="max-width: 180px; height: auto; border-radius: 8px;">
+                            <figcaption>古代ギリシャの四元素説</figcaption>
+                        </figure>
+                        <figure>
+                            <img src="Figure/Gemini_Generated_Image_8mv65s8mv65s8mv6.png" alt="古代ギリシャの哲学と社会" style="max-width: 180px; height: auto; border-radius: 8px;">
+                            <figcaption>古代ギリシャの哲学</figcaption>
+                        </figure>
+                    </div>
+                    <div class="tag">科学の原点</div> <div class="tag">哲学・思想</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="scale"></i></div>
+                <div class="content">
+                    <h2>1662年</h2>
+                    <h3>ボイルの法則：気体の振る舞いを数式で</h3>
+                    <p><strong>ロバート・ボイル</strong>は、J字型のガラス管に水銀と空気を閉じ込める実験を行い、気体の圧力($P$)と体積($V$)が、温度が一定の条件下で反比例の関係にあることを発見しました。これは、目に見えない気体の振る舞いを初めて普遍的な数式で記述した画期的な成果です。</p>
+                    <p>$$ P \propto \frac{1}{V} \quad \text{または} \quad PV = k \quad (\text{kは定数}) $$</p>
+                    <div class="illustration">
+                      <figure>
+			<img src="Figure/Boyle.png" alt="ボイルの実験" style="max-width: 180px; height: auto; border-radius: 8px;">
+                        <figcaption>ボイルの実験</figcaption>
+                        </figure>
+                    </div>
+                    <div class="tag">熱の計測</div> <div class="tag">理論の萌芽</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="fire-extinguisher"></i></div>
+                <div class="content">
+                    <h2>17世紀〜18世紀</h2>
+                    <h3>フロギストン説：燃焼の謎への挑戦</h3>
+                    <p><strong>ゲオルク・エルンスト・シュタール</strong>らによって提唱された、燃焼を説明するための初期の科学理論。可燃性の物質は「フロギストン（燃素）」という未知の元素を含んでおり、燃焼とはフロギストンが物質から放出される過程であるとされました。この説は、木が燃えると軽くなる現象などを説明できましたが、金属が燃えると重くなる（錆びる）事実を説明できず、後にラヴォアジエの酸素の発見によって否定されました。</p>
+                    <div class="illustration">
+                        <figure>
+                            <img src="Figure/phlogiston.png" alt="フロギストン説の概念図" style="max-width: 300px; height: auto;">
+                            <figcaption>燃焼とはフロギストンが抜けていく過程である</figcaption>
+                        </figure>
+                    </div>
+                    <div class="tag">熱とは何か？</div> <div class="tag">概念・理論</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="thermometer"></i></div>
+                <div class="content">
+                    <h2>17世紀初頭〜18世紀</h2>
+                    <h3>温度計の開発：熱を「見る」技術</h3>
+                    <p>熱の研究は、温度を客観的に測る道具の発明から始まりました。1600年頃、<strong>ガリレオ・ガリレイ</strong>は空気の熱膨張を利用した<strong>サーモスコープ</strong>を開発。これは温度変化を視覚化する初の試みでしたが、気圧にも左右される不完全なものでした。</p>
+                    <p>その後、液体（アルコールや水銀）をガラス管に封入した密閉型温度計が登場し、気圧の影響を受けない正確な測定が可能になります。そして18世紀、<strong>ファーレンハイト</strong>（1714年）と<strong>セルシウス</strong>（1742年）が、それぞれ華氏と摂氏という再現性の高い目盛りを考案。特に、水の氷点を0度、沸点を100度とする<strong>摂氏温度</strong>は、その科学的な明快さから世界標準となりました。これにより「温度」は世界共通の客観的な数値となり、熱の研究を感覚から解放し、定量科学へと飛躍させる土台が築かれました。</p>
+                    <div class="illustration">
+                        <figure>
+                            <img src="Figure/Gemini_Generated_Image_ggj0yxggj0yxggj0.png" alt="サーモスコープのイラスト" style="max-width: 150px; height: auto;">
+                            <figcaption>サーモスコープ</figcaption>
+                        </figure>
+                    </div>
+                    <div class="tag">熱の計測</div> <div class="tag">科学の土台</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                 <div class="timeline-icon"><i data-lucide="flame"></i></div>
+                <div class="content">
+                    <h2>18世紀後半</h2>
+                    <h3>熱の正体は？：「熱素説（カロリック説）」の隆盛</h3>
+                    <p>フロギストン説に代わり、<strong>アントワーヌ・ラヴォアジエ</strong>らは、熱を「カロリック」という質量のない粒子状の物質と考えました。熱い物体から冷たい物体へ熱が伝わるのは、カロリックが移動するためだと説明されました。この<strong>熱素説</strong>は、熱膨張や比熱の違いをうまく説明できたため、当時の科学界で広く受け入れられました。</p>
+                     <div class="illustration">
+                        <figure>
+                            <img src="Figure/caloric-theory.png" alt="カロリック説の概念図" style="max-width: 300px; height: auto;">
+                            <figcaption>カロリック説の概念図</figcaption>
+                        </figure>
+                    </div>
+                    <div class="tag">熱とは何か？</div> <div class="tag">概念・理論</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                 <div class="timeline-icon"><i data-lucide="thermometer-sun"></i></div>
+                <div class="content">
+                    <h2>1787-1802年</h2>
+                    <h3>シャルルの法則：温度と気体の関係</h3>
+                    <p><strong>ジャック・シャルル</strong>と<strong>ジョセフ・ルイ・ゲイ＝リュサック</strong>は、圧力が一定の条件下で、気体の体積($V$)が絶対温度($T$)に比例して増減することを発見。この関係を逆にたどると、理論上、気体の体積がゼロになる温度「絶対零度」の存在が示唆されました。</p>
+                    <p>$$ \frac{V}{T} = k' \quad (\text{k'は定数}) $$</p>
+                    <div class="illustration">
+                        <figure>
+                            <img src="Figure/balloons.jpg" alt="シャルルの法則を示す熱気球のイラスト" style="max-width: 300px; height: auto;">
+                            <figcaption>シャルルの法則を示す熱気球のイラスト</figcaption>
+                        </figure>
+                    </div>
+                    <div class="tag">熱の計測</div> <div class="tag">理論の萌芽</div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                 <div class="timeline-icon"><i data-lucide="rotate-cw"></i></div>
+                <div class="content">
+                    <h2>1798年</h2>
+                    <h3>熱素説への疑義</h3>
+                    <p><strong>ランフォード伯爵</strong>は、大砲の製造過程で、金属を削る摩擦によって無限に熱が発生することに気づきます。もし熱が物質（カロリック）ならば、有限の金属から無限の熱が生じるのはおかしい。彼は熱が物質ではなく「運動の一形態」ではないかと考え、熱素説に初めて科学的な疑問を投げかけました。</p>
+                    <div class="illustration">
+                       <figure>
+                           <img src="Figure/Rumford.png" alt="ランフォードの砲身穿孔実験のイラスト" style="max-width: 300px; height: auto;">
+                           <figcaption>ランフォードの中ぐり実験装置</figcaption>
+                       </figure>
+                    </div>
+                    <div class="tag">熱とは何か？</div> <div class="tag">パラダイムシフト</div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="waves"></i></div>
+                <div class="content">
+                    <h2>1820年代</h2>
+                    <h3>ポアソンの式：断熱過程の記述</h3>
+                    <p><strong>シメオン・ドニ・ポアソン</strong>は、外部との熱のやり取りなしに気体を圧縮・膨張させる「断熱過程」を記述する式を導出。($\gamma$は比熱比)。これは、熱機関内部の高速な変化や、音波が熱を伝えずに空気の密度の変化だけで伝わる現象を理論的に説明する上で不可欠なものでした。</p>
+                    <p>$$ PV^{\gamma} = \text{const.} $$</p>
+                    <div class="tag">概念・理論</div> <div class="tag">応用と生活</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="factory"></i></div>
+                <div class="content">
+                    <img src="Figure/Carnot2.png" alt="サディ・カルノーの肖像" class="scientist-image">
+                    <h2>1824年</h2>
+                    <h3>産業革命と熱機関の理論</h3>
+                    <p><strong>サディ・カルノー</strong>は、蒸気機関の効率を理論的に研究。熱が高温($T_H$)から低温($T_L$)へ移動する際にのみ「仕事」が取り出せ、その最大効率($\eta$)は温度差のみで決まることを示しました。これは後の<strong>熱力学第二法則</strong>の基礎となり、産業革命を科学的に支えました。</p>
+                    <p>$$ \eta_{\text{max}} = 1 - \frac{T_L}{T_H} $$</p>
+                    <div class="illustration">
+                        <figure>
+                            <img src="Figure/Carnot.png" alt="カルノーサイクルのPV図" style="max-width: 300px; height: auto;">
+                            <figcaption>カルノーサイクルのPV図</figcaption>
+                        </figure>
+                    </div>
+                    <div class="tag">応用と生活</div> <div class="tag">概念・理論</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="superscript"></i></div>
+                <div class="content">
+                    <h2>1834年</h2>
+                    <h3>理想気体の状態方程式：法則の統合</h3>
+                    <p><strong>エミール・クラペイロン</strong>は、ボイルの法則とシャルルの法則、アボガドロの法則を統合し、気体の圧力($P$)、体積($V$)、物質量($n$)、温度($T$)の関係を一本の式で表現しました。($R$は気体定数)。この<strong>理想気体の状態方程式</strong>は、熱力学の理論的体系化を大きく前進させました。</p>
+                    <p>$$ PV = nRT $$</p>
+                    <div class="tag">概念・理論</div> <div class="tag">理論の統合</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="recycle"></i></div>
+                <div class="content">
+                    <img src="Figure/Joule.png" alt="ジェームズ・プレスコット・ジュールの肖像" class="scientist-image">
+                    <h2>1840年代</h2>
+                    <h3>熱力学第一法則：エネルギー保存則の確立</h3>
+                    <p><strong>ジェームズ・プレスコット・ジュール</strong>は、羽根車でおもりを落下させ、水の温度を上げる実験により、力学的な仕事($W$)が熱($Q$)に変わり、その量が常に一定であること（<strong>熱の仕事当量</strong>）を証明しました。これにより熱素説は完全に否定され、「熱はエネルギーの一形態」として<strong>エネルギー保存則（熱力学第一法則）</strong>が確立しました。($\Delta U$は内部エネルギーの変化)。</p>
+                    <p>$$ \Delta U = Q - W $$</p>
+                    <div class="illustration">
+                        <figure>
+                            <img src="Figure/phy005Fig02.gif" alt="ジュールの実験の図解" style="max-width: 500px; height: auto;">
+                            <figcaption>ジュールの実験の図解</figcaption>
+                        </figure>
+                    </div>
+                    <div class="tag">熱とは何か？</div> <div class="tag">概念・理論</div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="git-compare-arrows"></i></div>
+                <div class="content">
+                    <h2>概念の転換</h2>
+                    <h3>熱素説 vs 運動エネルギー説</h3>
+                    <p>熱力学第一法則の確立は、熱の正体に関する見方を根本的に変えました。かつて主流だった「熱素説」と、それに取って代わった「運動エネルギー説」の考え方の違いは以下の通りです。</p>
+                    <table>
+                        <thead> <tr> <th>現象</th> <th>熱素説による説明（ストックの視点）</th> <th>運動エネルギー説による説明（フローの視点）</th> </tr> </thead>
+                        <tbody>
+                            <tr> <td><strong>熱の正体</strong></td> <td>質量がなく、保存される流体（カロリック）。物体内に貯蔵される**ストック**として捉えられる。</td> <td>原子や分子のランダムな運動エネルギー。エネルギーの**フロー（流れ）**の一形態。</td> </tr>
+                            <tr> <td><strong>摩擦による熱</strong></td> <td>物質からカロリックが「絞り出される」。有限のストックからは無限の生成を説明できない。</td> <td>力学的仕事（運動エネルギー）が、熱エネルギーへと**変換**されるフローのプロセス。</td> </tr>
+                            <tr> <td><strong>状態変化（潜熱）</strong></td> <td>カロリックが粒子と結合して「潜伏ストック」となり、状態変化を引き起こす。</td> <td>分子間力を克服するためにエネルギーが使われ、運動エネルギー（温度）の増加には寄与しない。</td> </tr>
+                        </tbody>
+                    </table>
+                     <div class="tag">パラダイムシフト</div> <div class="tag">概念・理論</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                 <div class="timeline-icon"><i data-lucide="arrow-right-circle"></i></div>
+                <div class="content">
+                    <h2>1850年代</h2>
+                    <h3>熱力学第二法則：エントロピーと時間の矢</h3>
+                    <p><strong>ルドルフ・クラウジウス</strong>は、熱が自然には高温から低温へしか移動しない不可逆性を「<strong>エントロピー</strong>($S$)」という概念で定式化。「孤立した系のエントロピーは増大し続ける」($\Delta S \ge 0$)という法則は、なぜ物事が一方通行に進むのか（例：ミルクがコーヒーに混ざると元に戻らない）を説明しました。</p>
+                    <p>この「元に戻らない」という性質は、物理学に<strong>「時間の矢」</strong>という深遠な概念をもたらしました。力学の世界では、ボールが跳ねる様子を逆再生しても不自然には見えません。しかし、熱が関わる現実の現象は常に一方向にしか進みません。エントロピーが増大する方向こそが、過去から未来への時間の流れを定義づけるのです。</p>
+                     <div class="illustration">
+                        <figure>
+                            <img src="Figure/coffee.jpeg.webp" alt="エントロピー増大の法則のイラスト" style="max-width: 400px; height: auto;">
+                            <figcaption>エントロピーが小さいときの例</figcaption>
+                        </figure>
+                    </div>
+                    <div class="tag">概念・理論</div> <div class="tag">時間の方向性</div>
+                </div>
+            </div>
+
+	    <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="atom"></i></div>
+                <div class="content">
+                    <img src="Figure/Boltzmann.jpg" alt="ルートヴィッヒ・ボルツマンの肖像" class="scientist-image">
+		    <h2>1877年</h2>
+                    <h3>統計力学の誕生：エントロピーの微視的解釈</h3>
+                    <p><strong>ルートヴィッヒ・ボルツマン</strong>は、エントロピー($S$)を原子や分子の「乱雑さの度合い」、より正確には「ある状態を取りうる場合の数($W$)」として統計的に説明しました。($k_B$はボルツマン定数)。マクロな熱現象が、ミクロな無数の粒子の確率的な振る舞いの結果であることを示し、熱力学に微視的な基礎を与えました。</p>
+                    <p>$$ S = k_B \log W $$</p>
+                    <p>この「場合の数($W$)」が多いか少ないかが、エントロピーの高低に対応します。</p>
+                    <ul>
+                        <li class="mt-2"><strong>エントロピーが低い状態（$W$が小さい）</strong>: 分子が取りうる状態の数が少ない、秩序だった状態です。例えば、絶対零度近くの完全な結晶では、原子は格子状にきれいに整列しており、位置や運動の自由度が極めて低いため、場合の数($W$)はほぼ1となり、エントロピーはゼロに近くなります。</li>
+                        <li class="mt-2"><strong>エントロピーが高い状態（$W$が大きい）</strong>: 分子が取りうる状態の数が非常に多い、無秩序な状態です。例えば、気体分子は容器の中を自由に飛び回り、様々な位置や速度を取ることができます。その組み合わせの数($W$)は天文学的な数になり、エントロピーは非常に高くなります。</li>
+                    </ul>
+                    <div class="illustration">
+                        <figure>
+                             <img src="Figure/en1.png" alt="ミクロ状態とマクロ状態の概念図" style="max-width: 900px; height: auto;">
+                             <figcaption>ミクロ状態とマクロ状態の概念図</figcaption>
+                        </figure>
+                    </div>
+                    <div class="tag">熱とは何か？</div> <div class="tag">概念・理論</div>
+                </div>
+            </div>
+	    
+            <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="bar-chart-3"></i></div>
+                <div class="content">
+                    <h2>1870年代</h2>
+                    <h3>ボルツマン分布：エネルギーと確率の架け橋</h3>
+                    <p>ボルツマンはさらに、ある温度($T$)の系において、粒子が特定のエネルギー状態($E$)をとる確率($P(E)$)が、そのエネルギーの指数関数に比例して減少することを示しました。これを<strong>ボルツマン分布</strong>と呼びます。エネルギーが高い状態ほど、その状態をとる粒子は指数関数的に少なくなることを意味し、気体分子の速度分布や化学反応の速度を理解する上で中心的な役割を果たします。</p>
+                    <p>$$ P(E) \propto e^{-E/k_B T} $$</p>
+                    <div class="illustration">
+                        <figure>
+                             <img src="Figure/maxwell-boltzmann.svg" alt="ボルツマン分布の模式図" style="max-width: 350px; height: auto;">
+                             <figcaption>高温（右）ほど高いエネルギーを持つ粒子が増える</figcaption>
+                        </figure>
+                    </div>
+                    <div class="tag">概念・理論</div> <div class="tag">統計力学</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="move-random"></i></div>
+                <div class="content">
+                    <img src="Figure/Einstein.jpg" alt="アルベルト・アインシュタインの肖像" class="scientist-image">
+                    <h2>1905年</h2>
+                    <h3>ブラウン運動：原子は実在した</h3>
+                    <p>植物学者<strong>ロバート・ブラウン</strong>が発見した、水中の花粉が不規則に動く現象（ブラウン運動）。この長年の謎を、<strong>アルベルト・アインシュタイン</strong>が「目に見えない無数の水分子が不均一に衝突するため」と理論的に解明しました。この理論は実験的に証明され、原子や分子が単なる仮説ではなく物理的に実在するものであることの決定的な証拠となり、ボルツマンの統計力学の正しさを裏付けました。</p>
+                    <div class="illustration">
+                        <figure>
+                             <img src="Figure/brownian-motion.png" alt="ブラウン運動の模式図" style="max-width: 300px; height: auto;">
+                             <figcaption>ブラウン運動の模式図</figcaption>
+                        </figure>
+                    </div>
+                    <div class="tag">熱とは何か？</div> <div class="tag">パラダイムシフト</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="sigma"></i></div>
+                <div class="content">
+                    <h2>19世紀〜20世紀初頭</h2>
+                    <h3>統計力学の数学的道具</h3>
+                    <p>統計力学は、確率論の強力な数学的ツールを物理学に応用するものです。特に重要なのが以下の概念です。</p>
+                    <p><strong>正規分布・中心極限定理:</strong> 個々の分子の速度はバラバラでも、その集団は釣鐘型の正規分布に従います。そして、無数の分子の運動の平均として現れる圧力や温度のようなマクロな量は、中心極限定理により、極めて安定した予測可能な値をとります。ミクロの偶然が、マクロの必然を生み出すのです。</p>
+                    <p><strong>ガウスと正規分布:</strong> 正規分布が「ガウス分布」とも呼ばれるのは、19世紀初頭の数学者カール・フリードリヒ・ガウスの功績に由来します。ガウスは、天体の軌道計算における観測データの誤差を分析するために、この分布を体系的に利用しました。彼は、誤差がこの釣鐘型の曲線に従うと仮定することで、最も確からしい軌道を導き出す「最小二乗法」を確立しました。これにより、正規分布は単なる数学的な曲線ではなく、現実世界の不確実性や誤差を記述するための強力なツールとして科学の最前線に登場し、後の統計力学の発展に不可欠なものとなりました。</p>
+                    <p>この分布を記述する数式は以下の通りです。ここで、$\mu$は平均値（分布の中心）、$\sigma$は標準偏差（分布の広がり具合）を表します。</p>
+                    $$ f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{ - \frac{(x-\mu)^2}{2\sigma^2} } $$
+                    <p><strong>ポアソン分布:</strong> ある空間や時間で、まれにしか起こらない事象の発生回数を記述します。放射性原子の崩壊など、個々の事象はランダムでも、集団としては予測可能な法則に従うことを示します。</p>
+                    <div class="illustration">
+                        <figure>
+                             <img src="Figure/distributions.png" alt="正規分布とポアソン分布のグラフ" style="max-width: 400px; height: auto;">
+                             <figcaption>統計分布の例</figcaption>
+                        </figure>
+                        <figure>
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/G3tkjuMh9So" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                            <figcaption>正規分布の例（動画）</figcaption>
+                        </figure>
+                    </div>
+                    <div class="tag">概念・理論</div> <div class="tag">統計力学</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="gauge-circle"></i></div>
+                <div class="content">
+                    <h2>20世紀初頭</h2>
+                    <h3>量子統計力学：ミクロの世界の奇妙なルール</h3>
+                    <p>19世紀末、黒体放射など古典物理学では説明できない現象が見つかりました。<strong>マックス・プランク</strong>の量子仮説(1900年)を皮切りに、熱力学は<strong>量子力学</strong>と融合。<strong>ボース</strong>、<strong>アインシュタイン</strong>、<strong>フェルミ</strong>、<strong>ディラック</strong>らは、ミクロの粒子が従う奇妙な統計法則（ボース＝アインシュタイン統計、フェルミ＝ディラック統計）を発見。これにより、レーザーや超伝導、半導体といった現代技術の基礎が築かれました。</p>
+                    <div class="illustration">
+                        <figure>
+                             <img src="Figure/nii02.png" alt="量子統計力学の概念図" style="max-width: 400px; height: auto;">
+                             <figcaption>ボース・アインシュタイン凝縮</figcaption>
+                        </figure>
+                    </div>
+                    <div class="tag">量子力学</div> <div class="tag">概念・理論</div>
+                </div>
+            </div>
+
+	    <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="info"></i></div>
+                <div class="content">
+                    <h2>1948年</h2>
+                    <h3>情報理論との融合：マクスウェルの悪魔</h3>
+                    <p><strong>クロード・シャノン</strong>は、情報の不確かさを測る尺度として「情報エントロピー」を提唱。その数式はボルツマンのエントロピーに酷似していました。この二つのエントロピーは、「<strong>マクスウェルの悪魔</strong>」という思考実験を通じて結びつきます。</p>
+                    <p>シャノンの情報エントロピー($H$)は、ある事象 $i$ が起こる確率を $p_i$ とすると、次のように定義されます。これは情報の「不確かさ」や「予測のできなさ」の度合いを表します。</p>
+                    <p>$$ H = -K \sum_i p_i \log p_i $$</p>
+                    <p>($K$は単位を合わせるための定数)</p>
+                    <p>一方、ボルツマンのエントロピー($S$)は、あるマクロな状態（例えば特定の温度や圧力）を実現するミクロな状態（個々の分子の位置や速度の組み合わせ）の数を $W$ として、次のように表されます。</p>
+                    <p>$$ S = k_B \log W $$</p>
+                    <p>この2つの式は一見すると違う形をしていますが、全てのミクロ状態が等しい確率($p_i = 1/W$)で起こると仮定すると、シャノンの式は次のように変形できます。</p>
+                    <p>$$ H = -K \sum_{i=1}^{W} \frac{1}{W} \log \frac{1}{W} = -K \cdot W \cdot \left(\frac{1}{W}\right) \log\left(\frac{1}{W}\right) = -K(-\log W) = K \log W $$</p>
+                    <p>これは、ボルツマンの式と定数倍を除いて全く同じ形です。この発見により、物理的な系の「乱雑さ」と、情報理論における「不確かさ」が、数学的に同じ構造を持つ深いつながりがあることが示されたのです。</p>
+                    <p>具体的に、エントロピーが高い状態と低い状態は以下のように考えられます。</p>
+                    <ul>
+                        <li class="mt-2"><strong>エントロピーが低い状態</strong>: 秩序があり、予測可能性が高い状態です。例えば、きれいに整列したコイン（全てが表を向いている）や、氷のように分子が規則正しく並んだ結晶状態がこれにあたります。取りうる状態の数($W$)が少なく、その状態を特定するのに必要な情報量も少なくなります。</li>
+                        <li class="mt-2"><strong>エントロピーが高い状態</strong>: 無秩序で、予測可能性が低い状態です。例えば、ランダムに投げられたコイン（表と裏が混在）や、気体のように分子が自由に飛び回っている状態です。取りうる状態の数($W$)が非常に多く、その特定の状態を記述するには多くの情報が必要になります。</li>
+                    </ul>
+                    <p><strong>マクスウェルの悪魔とは？:</strong> 分子で満たされた箱を壁で二つに仕切り、賢い「悪魔」が壁の扉を操作します。悪魔は速い分子だけを片方の部屋に、遅い分子をもう片方の部屋に振り分けます。すると、エネルギーを使わずに「熱い部屋」と「冷たい部屋」が生まれ、エントロピーが自発的に減少するように見え、これは熱力学第二法則に反する大問題でした。</p>
+                    <p><strong>パラドックスの解決:</strong> この謎は、「情報」そのものに物理的なコストがかかることを明らかにすることで解決されました。悪魔は分子の速度という「情報」を取得し、記憶し、そして次の分子のためにその記憶を「消去」しなければなりません。20世紀の物理学者たち（特にロルフ・ランダウアー）は、この<strong>「情報を消去する」行為には必ずエネルギーが必要で、周囲にエントロピーを放出する</strong>ことを証明しました。悪魔が分子の選別で減少させたエントロピーよりも、情報処理で発生させるエントロピーの方が大きいのです。これにより「情報」が物理的な量であることが明らかになり、コンピュータの発展に理論的基礎を与えました。</p>
+                    <div class="illustration">
+                        <figure>
+                             <img src="Figure/mk13.jpg.webp" alt="マクスウェルの悪魔の概念図" style="max-width: 500px; height: auto;">
+                             <figcaption>マクスウェルの悪魔</figcaption>
+                        </figure>
+                    </div>
+                    <div class="tag">情報理論</div> <div class="tag">概念・理論</div>
+                </div>
+            </div>
+	    
+            <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="dna"></i></div>
+                <div class="content">
+                    <h2>20世紀後半</h2>
+                    <h3>熱力学の応用と拡張：生命の秩序</h3>
+                    <p>熱力学の原理は物理学の枠を超え、化学、情報科学へと応用されます。特に<strong>イリヤ・プリゴジン</strong>は、生命のような「開放系」では、外部からエネルギーを取り込み内部のエントロピーを捨てることで、秩序ある構造（<strong>散逸構造</strong>）が自己組織化されうると提唱。生命がなぜ無秩序に逆らえるのかを説明しました。</p>
+                    <div class="illustration">
+                        <figure>
+                            <img src="Figure/sait.jpg" alt="散逸構造（生命体モデル）のイラスト" style="max-width: 300px; height: auto;">
+                            <figcaption>散逸構造</figcaption>
+                        </figure>
+                    </div>
+                    <div class="tag">応用と生活</div> <div class="tag">生命科学へ</div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-icon"><i data-lucide="brain-circuit"></i></div>
+                <div class="content">
+                    <h2>21世紀</h2>
+                    <h3>生命と意識の謎へ：自由エネルギー原理</h3>
+                    <p><strong>カール・フリストン</strong>らは、熱力学や統計学の考え方を応用し、脳や生命を「驚き（＝予測誤差）を最小化する存在」として捉える<strong>自由エネルギー原理</strong>を提唱。知覚や行動は全て、世界を予測し、その予測とのズレを減らすための働きであると説明し、「私とは何か」という根源的な問いに迫ろうとしています。例) 自由エネルギー原理は、特定の感覚入力を受けたときにどのように学習が起こるか、また神経回路の興奮性の変化によってどのように学習が減衰するかを予測することができた。これにより、自由エネルギー原理がこの培養神経回路の自己組織化原理として妥当であることを実証した。[Isomura et al. 2015]</p>
+                    <div class="illustration">
+                       <figure>
+                           <img src="Figure/20230807_1_fig.jpg" alt="自由エネルギー原理のループ図" style="max-width: 700px; height: auto;">
+                           <figcaption>培養神経回路の概略（左）と実効的シナプス強度が自由エネルギー勾配を降下する様子（右）[Isomura et al. 2015]</figcaption>
+                       </figure>
+                    </div>
+                    <div class="tag">応用と生活</div> <div class="tag">脳科学・生命科学</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Lucide Iconsを描画
+            lucide.createIcons();
+    
+            // KaTeXで数式を描画
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ],
+                // エラーが発生しても処理を止めないオプション
+                throwOnError: false
+            });
+        });
+    </script>
+</body>
+</html>
